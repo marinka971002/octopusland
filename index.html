@@ -25,9 +25,17 @@ table{width:100%;border-collapse:separate;border-spacing:0;background:var(--pane
 #unitTable tbody tr:nth-child(even) td:not(:nth-child(-n+3)){background:#0f172a}
 #unitTable tbody tr:hover td{background:#1e293b!important}
 #unitTable td.na{color:#94a3b8;text-align:center}
+
+.filterbar{position:sticky;top:0;z-index:20;background:#0b1020;border:1px solid #263552;border-radius:14px;padding:12px 14px;margin:0 0 14px;display:flex;gap:12px;align-items:end;flex-wrap:wrap;box-shadow:0 8px 24px #0005}.filterbar label{font-size:12px;color:#94a3b8;font-weight:700}.filterbar select,.filterbar input{display:block;margin-top:5px;background:#111827;color:#edf2ff;border:1px solid #334155;border-radius:9px;padding:8px 10px}.filterbar .status{margin-left:auto;min-width:260px}.filterbar .status b{color:#e5e7eb}.custom-dates{display:none;gap:8px;align-items:end}.custom-dates.show{display:flex}
 </style></head>
 <body><header><h1>Octopusland — аналитика маркетплейсов</h1><div class="sub">Ozon + Яндекс Маркет · УСН 6% · данные встроены в файл · сентябрь частичный</div></header>
 <div class="wrap">
+<div class="filterbar" id="globalFilters">
+<label>Период<select id="periodFilter"><option value="all">Весь период</option><option value="2026-07">Июль 2026</option><option value="2026-08">Август 2026</option><option value="2026-09">Сентябрь 2026</option><option value="current">Текущий месяц</option><option value="custom">Свой период</option></select></label>
+<label>Данные<select id="platformFilter"><option value="all">Все площадки</option><option value="Ozon">Ozon</option><option value="Яндекс">Яндекс</option></select></label>
+<div class="custom-dates" id="customDates"><label>С<input type="date" id="dateFrom" value="2026-07-01"></label><label>По<input type="date" id="dateTo" value="2026-09-30"></label></div>
+<div class="status small" id="filterStatus"></div>
+</div>
 <div class="tabs" id="tabs">
 <button data-tab="overview" class="active">Обзор</button><button data-tab="unit">Юнит-экономика</button><button data-tab="yandex">Яндекс</button><button data-tab="ozon">Ozon</button><button data-tab="current">Текущий период</button><button data-tab="stocks">Остатки и поставки</button><button data-tab="funnel">Воронка / Boost</button><button data-tab="bank">Деньги / расходы</button><button data-tab="upload">Загрузка данных</button><button data-tab="quality">Качество данных</button>
 </div>
@@ -51,8 +59,19 @@ table{width:100%;border-collapse:separate;border-spacing:0;background:var(--pane
   <div class="card"><div class="k">Что распознаётся</div><div class="small" style="line-height:1.8">Ozon — orders / реализация / услуги и расходы / остатки<br>Яндекс — united orders / statistics / marketplace services / Business Boost<br>Octopusland — себестоимость<br>Банк — поступления, списания и операционные расходы</div></div>
 </div>
 <h2>История и база данных</h2>
+<div class="card" style="margin-bottom:14px"><div class="k">Уже в базе — встроенная ретроистория</div><div class="small" style="margin:6px 0 12px">Эти данные находятся внутри сайта, участвуют в текущих расчётах и не удаляются при очистке новых загрузок.</div>
+<div class="scroll"><table><thead><tr><th>Источник</th><th>Период</th><th>Что встроено</th><th>Объём</th><th>Статус</th></tr></thead><tbody>
+<tr><td><b>Ozon</b></td><td>Июль–август 2026</td><td>Финансы: реализация, комиссия, доставка, возвраты/невыкупы</td><td>2 закрытых месяца</td><td><span class="good">● Встроено</span></td></tr>
+<tr><td><b>Ozon</b></td><td>21.06–18.09.2026</td><td>Заказы для оперативного среза и прогноза поставок</td><td>89 заказов</td><td><span class="good">● Встроено</span></td></tr>
+<tr><td><b>Ozon</b></td><td>На дату выгрузки</td><td>Остатки по SKU, складам и кластерам</td><td>12 строк остатков</td><td><span class="good">● Встроено</span></td></tr>
+<tr><td><b>Яндекс</b></td><td>Июль–август 2026</td><td>Продажи/статистика и фактические услуги по SKU</td><td>Закрытая история</td><td><span class="good">● Встроено</span></td></tr>
+<tr><td><b>Яндекс</b></td><td>01–20.09.2026</td><td>Текущие заказы и услуги</td><td>Сентябрь частичный</td><td><span class="warn">● Частичный период</span></td></tr>
+<tr><td><b>Яндекс</b></td><td>Исходная сборка</td><td>Воронка продаж и Business Boost</td><td>10 + 9 строк</td><td><span class="good">● Встроено</span></td></tr>
+<tr><td><b>Octopusland</b></td><td>Исходная сборка</td><td>Себестоимость</td><td>4 SKU</td><td><span class="warn">● Частичное покрытие</span></td></tr>
+<tr><td><b>Банк</b></td><td>III квартал 2026</td><td>Поступления и операционные расходы</td><td>43 операции</td><td><span class="good">● Встроено</span></td></tr>
+</tbody></table></div></div>
 <div class="row2">
-  <div class="card"><div class="k">Базовая история</div><div class="small" style="line-height:1.8">Встроена в сайт и не удаляется при очистке добавленных данных.<br><b>Ozon:</b> финансовая история, заказы и остатки из исходной сборки.<br><b>Яндекс:</b> продажи/статистика, услуги и Business Boost из исходной сборки.<br><b>Octopusland:</b> себестоимость и банковские/операционные данные из исходной сборки.</div></div>
+  <div class="card"><div class="k">Как работает история</div><div class="small" style="line-height:1.8"><b>Встроенная база</b> — стартовая ретроистория выше.<br><b>Новые загрузки</b> — сохраняются отдельно в браузере.<br><b>Сброс новых данных</b> никогда не удаляет встроенную историю.</div></div>
   <div class="card"><div class="k">Локальная накопительная база</div><div id="dbSummary" class="small" style="line-height:1.8">Проверяю сохранённые данные…</div></div>
 </div>
 <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0">
@@ -75,61 +94,40 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('section').forEach(x=>x.classList.remove('active'));document.getElementById(b.dataset.tab).classList.add('active')});
 
 const total=(arr,k)=>arr.reduce((a,r)=>a+(+r[k]||0),0);
-const closed=D.unit.filter(r=>r.month!=='2026-09*');
-const rev=total(closed,'revenue'), fees=total(closed,'fees'), tax=total(closed,'tax'), qty=total(closed,'qty');
-const known=closed.filter(r=>r.profit!=null), profit=total(known,'profit'), knownRev=total(known,'revenue');
-document.getElementById('kpis').innerHTML=[
-['Выручка июль–август',rub(rev)],['Продано',num(qty)+' шт.'],['Расходы площадок',rub(fees)],['УСН 6%',rub(tax)],['Прибыль по SKU с себесом',rub(profit)],['Покрытие себестоимостью',pct(knownRev/rev*100)]
-].map(x=>`<div class="card"><div class="k">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
-document.getElementById('bankKpi').textContent=rub(D.bank_totals.in)+' / '+rub(D.bank_totals.out);
-
+let activePeriod=localStorage.getItem('octopusland_period')||'all';
+let activePlatform=localStorage.getItem('octopusland_platform')||'all';
+const pf=document.getElementById('periodFilter'), plf=document.getElementById('platformFilter');
+if([...pf.options].some(o=>o.value===activePeriod))pf.value=activePeriod;if([...plf.options].some(o=>o.value===activePlatform))plf.value=activePlatform;
+function normMonth(m){return String(m||'').replace('*','')}
+function periodMatchMonth(m){m=normMonth(m);if(activePeriod==='all')return true;if(activePeriod==='current')return m==='2026-09';if(activePeriod==='custom'){const a=document.getElementById('dateFrom').value.slice(0,7),b=document.getElementById('dateTo').value.slice(0,7);return (!a||m>=a)&&(!b||m<=b)}return m===activePeriod}
+function platformMatch(p){return activePlatform==='all'||p===activePlatform}
+function filterUnits(){return D.unit.filter(r=>periodMatchMonth(r.month)&&platformMatch(r.platform)).sort((a,b)=>(a.platform+a.month+a.sku).localeCompare(b.platform+b.month+b.sku))}
+function filterSummary(){return D.summary.filter(r=>periodMatchMonth(r.month)&&platformMatch(r.platform))}
+function periodLabel(){if(activePeriod==='all')return 'Весь доступный период';if(activePeriod==='current')return 'Текущий месяц · сентябрь 2026';if(activePeriod==='custom')return `${document.getElementById('dateFrom').value||'…'} — ${document.getElementById('dateTo').value||'…'}`;return {'2026-07':'Июль 2026','2026-08':'Август 2026','2026-09':'Сентябрь 2026'}[activePeriod]||activePeriod}
+function unitDisplay(r,key){if(key==='platform'||key==='month'||key==='sku'||key==='name')return r[key]||'—';if(key==='qty')return num(r.qty);if(key==='profit_unit')return r.profit==null||!r.qty?'—':rub(r.profit/r.qty);if(key==='margin'||key==='roi')return pct(r[key]);return rub(r[key])}
+const unitColumns=[['platform','Площадка'],['month','Месяц'],['sku','SKU'],['name','Товар'],['qty','Продано'],['revenue','Выручка'],['cost_unit','Себес/шт'],['cogs','Себестоимость'],['fees','Расходы МП'],['tax','УСН 6%'],['profit','Прибыль'],['profit_unit','Прибыль/шт'],['margin','Маржа'],['roi','ROI']];
 function table(el,headers,rows){document.getElementById(el).innerHTML='<thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'+rows.join('')+'</tbody>'}
-table('summary',['Площадка','Месяц','Выручка','Продано','Расходы МП','УСН','Покрытие себесом','Прибыль*'],D.summary.map(r=>`<tr><td>${r.platform}</td><td>${r.month}</td><td>${rub(r.revenue)}</td><td>${num(r.qty)}</td><td>${rub(r.fees)}</td><td>${rub(r.tax)}</td><td>${pct(r.coverage)}</td><td>${rub(r.profit_known)}</td></tr>`));
-
-const u=[...D.unit].sort((a,b)=>(a.platform+a.month+a.sku).localeCompare(b.platform+b.month+b.sku));
-const unitColumns=[
-  ['platform','Площадка'],['month','Месяц'],['sku','SKU'],['name','Товар'],['qty','Продано'],
-  ['revenue','Выручка'],['cost_unit','Себес/шт'],['cogs','Себестоимость'],['fees','Расходы МП'],
-  ['tax','УСН 6%'],['profit','Прибыль'],['profit_unit','Прибыль/шт'],['margin','Маржа'],['roi','ROI']
-];
-function unitDisplay(r,key){
-  if(key==='platform'||key==='month'||key==='sku'||key==='name') return r[key]||'—';
-  if(key==='qty') return num(r.qty);
-  if(key==='profit_unit') return r.profit==null||!r.qty?'—':rub(r.profit/r.qty);
-  if(key==='margin'||key==='roi') return pct(r[key]);
-  return rub(r[key]);
+function renderUnitTable(u){const t=document.getElementById('unitTable');t.replaceChildren();const cg=document.createElement('colgroup');unitColumns.forEach(()=>cg.appendChild(document.createElement('col')));t.appendChild(cg);const thead=document.createElement('thead'),hr=document.createElement('tr');unitColumns.forEach(([,label])=>{const th=document.createElement('th');th.textContent=label;hr.appendChild(th)});thead.appendChild(hr);t.appendChild(thead);const tbody=document.createElement('tbody');u.forEach((r,idx)=>{const tr=document.createElement('tr');tr.dataset.row=String(idx);unitColumns.forEach(([key])=>{const td=document.createElement('td'),v=unitDisplay(r,key);td.textContent=v;td.dataset.field=key;if(v==='—')td.classList.add('na');if(key==='name')td.title=r.name||'';tr.appendChild(td)});tbody.appendChild(tr)});t.appendChild(tbody)}
+function renderFinance(){
+ const u=filterUnits(), sum=filterSummary();
+ const rev=total(u,'revenue'),fees=total(u,'fees'),tax=total(u,'tax'),qty=total(u,'qty'),known=u.filter(r=>r.profit!=null),profit=total(known,'profit'),knownRev=total(known,'revenue');
+ document.getElementById('kpis').innerHTML=[['Выручка',rub(rev)],['Продано',num(qty)+' шт.'],['Расходы площадок',rub(fees)],['УСН 6%',rub(tax)],['Прибыль по SKU с себесом',rub(profit)],['Покрытие себестоимостью',rev?pct(knownRev/rev*100):'—']].map(x=>`<div class="card"><div class="k">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
+ table('summary',['Площадка','Месяц','Выручка','Продано','Расходы МП','УСН','Покрытие себесом','Прибыль*'],sum.map(r=>`<tr><td>${r.platform}</td><td>${r.month}</td><td>${rub(r.revenue)}</td><td>${num(r.qty)}</td><td>${rub(r.fees)}</td><td>${rub(r.tax)}</td><td>${pct(r.coverage)}</td><td>${rub(r.profit_known)}</td></tr>`));
+ renderUnitTable(u);
+ const yu=u.filter(r=>r.platform==='Яндекс'),ou=u.filter(r=>r.platform==='Ozon');
+ table('yTable',['Месяц','SKU','Продано','Выручка','Услуги Маркета','Доля услуг','УСН','Прибыль*','Маржа'],yu.map(r=>`<tr><td>${r.month}</td><td>${esc(r.sku)}</td><td>${num(r.qty)}</td><td>${rub(r.revenue)}</td><td>${rub(r.fees)}</td><td>${r.revenue?pct(r.fees/r.revenue*100):'—'}</td><td>${rub(r.tax)}</td><td>${rub(r.profit)}</td><td>${pct(r.margin)}</td></tr>`));
+ table('oTable',['Месяц','SKU','Нетто шт.','Реализовано по цене продавца','Комиссия Ozon','Доставка','Возвраты/невыкупы','Всего расходов МП','УСН','Прибыль*'],ou.map(r=>`<tr><td>${r.month}</td><td>${esc(r.sku)}</td><td>${num(r.qty)}</td><td>${rub(r.revenue)}</td><td>${rub(r.commission)}</td><td>${rub(r.logistics)}</td><td>${rub(r.returns)}</td><td>${rub(r.fees)}</td><td>${rub(r.tax)}</td><td>${rub(r.profit)}</td></tr>`));
+ const worst=known.slice().sort((a,b)=>a.profit-b.profit).slice(0,5),best=known.slice().sort((a,b)=>b.profit-a.profit).slice(0,5);
+ document.getElementById('insights').innerHTML='<div class="k">Топ по рассчитанной прибыли</div>'+best.map(r=>`<div>${r.platform} · ${r.month} · <b>${r.sku}</b>: <span class="good">${rub(r.profit)}</span></div>`).join('')+'<br><div class="k">Антитоп</div>'+worst.map(r=>`<div>${r.platform} · ${r.month} · <b>${r.sku}</b>: <span class="${r.profit<0?'bad':'good'}">${rub(r.profit)}</span></div>`).join('');
+ const plat=activePlatform==='all'?'Ozon + Яндекс':activePlatform;document.getElementById('filterStatus').innerHTML=`Показано: <b>${periodLabel()}</b> · <b>${plat}</b><br>Финансовых строк: ${u.length}`;
+ renderCurrent();renderBank();
 }
-function renderUnitTable(){
-  const t=document.getElementById('unitTable'); t.replaceChildren();
-  const cg=document.createElement('colgroup');
-  unitColumns.forEach(()=>cg.appendChild(document.createElement('col'))); t.appendChild(cg);
-  const thead=document.createElement('thead'), hr=document.createElement('tr');
-  unitColumns.forEach(([,label])=>{const th=document.createElement('th');th.textContent=label;hr.appendChild(th)});
-  thead.appendChild(hr);t.appendChild(thead);
-  const tbody=document.createElement('tbody');
-  u.forEach((r,idx)=>{
-    const tr=document.createElement('tr'); tr.dataset.row=String(idx); tr.dataset.sku=r.sku||'';
-    unitColumns.forEach(([key])=>{const td=document.createElement('td'); const v=unitDisplay(r,key); td.textContent=v; td.dataset.field=key; if(v==='—')td.classList.add('na'); if(key==='name')td.title=r.name||''; tr.appendChild(td)});
-    if(tr.children.length!==unitColumns.length) throw new Error('Unit row mismatch '+(r.sku||idx));
-    tbody.appendChild(tr);
-  });
-  t.appendChild(tbody);
-}
-renderUnitTable();
+function renderCurrent(){const showSep=activePeriod==='all'||activePeriod==='current'||activePeriod==='2026-09'||(activePeriod==='custom'&&periodMatchMonth('2026-09'));const ozCur=showSep&&platformMatch('Ozon')?D.ozon_orders.filter(r=>String(r['Принят в обработку']||'').startsWith('2026-09')):[];const yaCur=showSep&&platformMatch('Яндекс')?D.unit.filter(r=>r.platform==='Яндекс'&&r.month==='2026-09*'):[];const ozQty=ozCur.reduce((a,r)=>a+(+r['Количество']||0),0),ozAmt=ozCur.reduce((a,r)=>a+(+r['Сумма отправления']||0),0),yaQty=total(yaCur,'qty'),yaAmt=total(yaCur,'revenue'),yaFees=total(yaCur,'fees');document.getElementById('currentKpi').innerHTML=`<div class="card"><div class="k">Ozon · заказы</div><div class="v">${num(ozCur.length)}</div><div class="small">${num(ozQty)} шт. · ${rub(ozAmt)}</div></div><div class="card"><div class="k">Яндекс · текущий период</div><div class="v">${rub(yaAmt)}</div><div class="small">${num(yaQty)} шт. · услуги ${rub(yaFees)}</div></div><div class="card"><div class="k">Итого оперативно</div><div class="v">${rub(ozAmt+yaAmt)}</div></div>`;table('currentTable',['Площадка','Период','Заказы/строки','Продано, шт.','Оперативная сумма','Расходы МП','Комментарий'],[...(platformMatch('Ozon')?[`<tr><td>Ozon</td><td>сентябрь</td><td>${num(ozCur.length)}</td><td>${num(ozQty)}</td><td>${rub(ozAmt)}</td><td>—</td><td>Расходы после закрытия финансового отчёта</td></tr>`]:[]),...(platformMatch('Яндекс')?[`<tr><td>Яндекс</td><td>01–20.09</td><td>${num(yaCur.length)}</td><td>${num(yaQty)}</td><td>${rub(yaAmt)}</td><td>${rub(yaFees)}</td><td>Есть услуги по заказам</td></tr>`]:[])])}
+function renderBank(){let rows=D.bank;if(activePeriod!=='all'){rows=rows.filter(r=>{const d=String(r.date||'');if(activePeriod==='custom'){const a=document.getElementById('dateFrom').value,b=document.getElementById('dateTo').value;return (!a||d>=a)&&(!b||d<=b)}const m=activePeriod==='current'?'2026-09':activePeriod;return d.startsWith(m)})}table('bankTable',['Дата','Контрагент','Поступило','Списано','Тип','Расшифровка'],rows.map(r=>`<tr><td>${r.date}</td><td>${esc(r.counterparty)}</td><td class="good">${r.in?rub(r.in):''}</td><td class="bad">${r.out?rub(r.out):''}</td><td>${esc(r.type)}</td><td>${esc(r.desc)}</td></tr>`));document.getElementById('bankKpi').textContent=rub(rows.reduce((a,r)=>a+(+r.in||0),0))+' / '+rub(rows.reduce((a,r)=>a+(+r.out||0),0))}
+function applyFilters(){activePeriod=pf.value;activePlatform=plf.value;localStorage.setItem('octopusland_period',activePeriod);localStorage.setItem('octopusland_platform',activePlatform);document.getElementById('customDates').classList.toggle('show',activePeriod==='custom');renderFinance()}
+pf.addEventListener('change',applyFilters);plf.addEventListener('change',applyFilters);document.getElementById('dateFrom').addEventListener('change',applyFilters);document.getElementById('dateTo').addEventListener('change',applyFilters);document.getElementById('customDates').classList.toggle('show',activePeriod==='custom');
+renderFinance();
 
-const yu=u.filter(r=>r.platform==='Яндекс');
-table('yTable',['Месяц','SKU','Продано','Выручка','Услуги Маркета','Доля услуг','УСН','Прибыль*','Маржа'],yu.map(r=>`<tr><td>${r.month}</td><td>${esc(r.sku)}</td><td>${num(r.qty)}</td><td>${rub(r.revenue)}</td><td>${rub(r.fees)}</td><td>${r.revenue?pct(r.fees/r.revenue*100):'—'}</td><td>${rub(r.tax)}</td><td>${rub(r.profit)}</td><td>${pct(r.margin)}</td></tr>`));
-const ou=u.filter(r=>r.platform==='Ozon');
-table('oTable',['Месяц','SKU','Нетто шт.','Реализовано по цене продавца','Комиссия Ozon','Доставка','Возвраты/невыкупы','Всего расходов МП','УСН','Прибыль*'],ou.map(r=>`<tr><td>${r.month}</td><td>${esc(r.sku)}</td><td>${num(r.qty)}</td><td>${rub(r.revenue)}</td><td>${rub(r.commission)}</td><td>${rub(r.logistics)}</td><td>${rub(r.returns)}</td><td>${rub(r.fees)}</td><td>${rub(r.tax)}</td><td>${rub(r.profit)}</td></tr>`));
-
-const ozCur=D.ozon_orders.filter(r=>String(r['Принят в обработку']||'').startsWith('2026-09'));
-const yaCur=D.unit.filter(r=>r.platform==='Яндекс' && r.month==='2026-09*');
-const ozQty=ozCur.reduce((a,r)=>a+(+r['Количество']||0),0), ozAmt=ozCur.reduce((a,r)=>a+(+r['Сумма отправления']||0),0);
-const yaQty=yaCur.reduce((a,r)=>a+(+r.qty||0),0), yaAmt=yaCur.reduce((a,r)=>a+(+r.revenue||0),0), yaFees=yaCur.reduce((a,r)=>a+(+r.fees||0),0);
-document.getElementById('currentKpi').innerHTML=`<div class="card"><div class="k">Ozon · заказы</div><div class="v">${num(ozCur.length)}</div><div class="small">${num(ozQty)} шт. · сумма отправлений ${rub(ozAmt)}</div></div><div class="card"><div class="k">Яндекс · текущий период</div><div class="v">${rub(yaAmt)}</div><div class="small">${num(yaQty)} шт. · услуги ${rub(yaFees)}</div></div><div class="card"><div class="k">Итого оперативно</div><div class="v">${rub(ozAmt+yaAmt)}</div><div class="small">Ozon + Яндекс; показатели имеют разные источники до закрытия периода</div></div>`;
-table('currentTable',['Площадка','Период','Заказы/строки','Продано, шт.','Оперативная сумма','Расходы МП','Комментарий'],[
-`<tr><td>Ozon</td><td>сентябрь</td><td>${num(ozCur.length)}</td><td>${num(ozQty)}</td><td>${rub(ozAmt)}</td><td>—</td><td>Расходы берём после закрытия финансового отчёта</td></tr>`,
-`<tr><td>Яндекс</td><td>01–20.09</td><td>${num(yaCur.length)}</td><td>${num(yaQty)}</td><td>${rub(yaAmt)}</td><td>${rub(yaFees)}</td><td>Есть услуги по заказам</td></tr>`]);
 let stockPlatform='all';
 function stockPriority(days, daily){if(!daily)return {label:'Нет продаж',cls:'na',rank:5};if(days<7)return {label:'🔴 Срочно',cls:'bad',rank:0};if(days<14)return {label:'🟠 В ближайшее время',cls:'warn',rank:1};if(days<28)return {label:'🟡 Запланировать',cls:'warn',rank:2};if(days<=60)return {label:'🟢 Не срочно',cls:'good',rank:3};return {label:'🔵 Избыток',cls:'',rank:4}}
 function ozonStockForecast(targetDays){
@@ -156,16 +154,12 @@ document.querySelectorAll('.stock-filter').forEach(b=>b.addEventListener('click'
 table('funnelTable',['SKU','Показы','Корзины','Заказано','Сумма заказов','Корзина→заказ','Доставлено','Выручка доставленного'],D.funnel.map(r=>`<tr><td>${esc(r['Ваш SKU'])}</td><td>${num(r['Показы моих товаров, шт.'])}</td><td>${num(r['Добавления в корзину, шт.'])}</td><td>${num(r['Заказанные товары, шт.'])}</td><td>${rub(r['Заказано товаров на сумму, ₽'])}</td><td>${pct(r['Конверсия из корзины в заказ, %'])}</td><td>${num(r['Доставлено за период, шт.'])}</td><td>${rub(r['Доставлено за период на сумму, ₽'])}</td></tr>`));
 table('boostTable',['SKU','Показы с Boost','Клики','Заказано','Доставлено','Расход Boost','ДРР Boost','Выручка Boost','Кампания'],D.boost.map(r=>`<tr><td>${esc(r['Ваш SKU'])}</td><td>${num(r['Показы товара с бустом, шт.'])}</td><td>${num(r['Клики по товару с бустом, шт.'])}</td><td>${num(r['Заказанные товары с бустом, шт.'])}</td><td>${num(r['Доставленные товары с бустом, шт.'])}</td><td>${rub(r['Расходы на буст, ₽'])}</td><td>${pct(r['Доля расходов на буст от выручки с бустом, %'])}</td><td>${rub(r['Выручка с бустом, ₽'])}</td><td>${esc(r['Названия кампаний'])}</td></tr>`));
 
-table('bankTable',['Дата','Контрагент','Поступило','Списано','Тип','Расшифровка'],D.bank.map(r=>`<tr><td>${r.date}</td><td>${esc(r.counterparty)}</td><td class="good">${r.in?rub(r.in):''}</td><td class="bad">${r.out?rub(r.out):''}</td><td>${esc(r.type)}</td><td>${esc(r.desc)}</td></tr>`));
 
 const noCost=[...new Set(D.unit.filter(r=>r.cost_unit==null && r.revenue>0).map(r=>r.sku))];
 const q=`<div class="grid"><div class="card"><div class="k">Строк юнитки</div><div class="v">${D.unit.length}</div></div><div class="card"><div class="k">SKU без себестоимости</div><div class="v">${noCost.length}</div><div class="small">${noCost.join(', ')}</div></div><div class="card"><div class="k">Строк остатков Ozon</div><div class="v">${D.stocks.length}</div></div><div class="card"><div class="k">Банковских операций Q3</div><div class="v">${D.bank.length}</div></div></div>
 <div class="note">Финансовая юнитка Ozon рассчитана из отчёта расходов на реализацию за июль–август. Яндекс: июль–август — отчёты реализации + все листы фактических услуг; сентябрь — отчёт заказов 01–20.09 с услугами по заказам. Текущая воронка/Boost и остатки имеют собственные периоды и поэтому не используются как замена закрытой финансовой реализации.</div>`;
 document.getElementById('qualityBox').innerHTML=q;
 
-const worst=known.slice().sort((a,b)=>a.profit-b.profit).slice(0,5);
-const best=known.slice().sort((a,b)=>b.profit-a.profit).slice(0,5);
-document.getElementById('insights').innerHTML='<div class="k">Топ по рассчитанной прибыли</div>'+best.map(r=>`<div>${r.platform} · ${r.month} · <b>${r.sku}</b>: <span class="good">${rub(r.profit)}</span></div>`).join('')+'<br><div class="k">Антитоп</div>'+worst.map(r=>`<div>${r.platform} · ${r.month} · <b>${r.sku}</b>: <span class="${r.profit<0?'bad':'good'}">${rub(r.profit)}</span></div>`).join('');
 
 function csvParse(text){const rows=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'){if(q&&n==='"'){cell+='"';i++;}else q=!q;}else if(c===','&&!q){row.push(cell);cell='';}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&n==='\n')i++;row.push(cell);cell='';if(row.some(x=>x!==''))rows.push(row);row=[];}else cell+=c;}if(cell||row.length){row.push(cell);rows.push(row)}return rows}
 function detectUpload(name,headers){const n=name.toLowerCase(),h=headers.join(' ').toLowerCase();if(h.includes('номер заказа')&&h.includes('артикул')&&h.includes('кластер'))return 'Ozon · заказы';if(h.includes('ваш sku')&&(h.includes('остаток')||h.includes('доступно')||h.includes('на складе')))return 'Яндекс · остатки';if(h.includes('ваш sku')&&(h.includes('стоимость услуги')||h.includes('название услуги')))return 'Яндекс · услуги';if(h.includes('ваш sku')&&(h.includes('сумма заказа')||h.includes('заказано')))return 'Яндекс · заказы/статистика';if(h.includes('доступно')&&h.includes('кластер')&&h.includes('sku'))return 'Ozon · остатки';if(n.includes('boost')||h.includes('буст'))return 'Яндекс · Business Boost';if(h.includes('себестоим')||h.includes('закуп'))return 'Себестоимость';if(h.includes('списан')||h.includes('поступлен')||h.includes('назначение платежа'))return 'Банк / расходы';if(h.includes('вознаграждение ozon')||h.includes('реализовано'))return 'Ozon · финансы';return 'Не определён автоматически'}
