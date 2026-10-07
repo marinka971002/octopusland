@@ -2,31 +2,13 @@
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Octopusland — Ozon + Яндекс Маркет</title>
 <style>
-:root{--bg:#0b1020;--panel:#121a2e;--panel2:#17223b;--text:#edf2ff;--muted:#9aa8c7;--line:#263552;--good:#4ade80;--bad:#fb7185;--warn:#fbbf24;--accent:#7dd3fc}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
-header{position:sticky;top:0;z-index:5;background:#0b1020eF;border-bottom:1px solid var(--line);padding:18px 24px;backdrop-filter:blur(10px)}
-h1{margin:0;font-size:25px} .sub{color:var(--muted);margin-top:4px} .wrap{padding:22px;max-width:1600px;margin:auto}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0} button{background:var(--panel);color:var(--text);border:1px solid var(--line);padding:9px 13px;border-radius:10px;cursor:pointer}button.active{background:#1e3a5f;border-color:#38bdf8}
-.grid{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:12px} .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px} .k{color:var(--muted);font-size:12px} .v{font-size:22px;font-weight:750;margin-top:4px} .small{font-size:12px;color:var(--muted)}
-section{display:none} section.active{display:block} h2{margin:24px 0 12px} .note{padding:12px 14px;border:1px solid #665a20;background:#2a2410;border-radius:12px;color:#fde68a;margin:12px 0}
-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden} th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;vertical-align:middle} th{position:sticky;top:0;background:#18233b;color:#c8d4ee;font-size:12px;z-index:4} thead{display:table-header-group} tbody{display:table-row-group} th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left} tr:last-child td{border-bottom:0} .scroll{overflow:auto;max-height:650px;border-radius:12px;position:relative} .good{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)} .muted{color:var(--muted)}
-.bar{height:9px;background:#23304a;border-radius:10px;overflow:hidden}.bar i{display:block;height:100%;background:#7dd3fc} .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px} input,select{background:#0d1527;color:white;border:1px solid var(--line);padding:8px;border-radius:9px}
-@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}.row2{grid-template-columns:1fr} th{top:100px}}
-#unitTable{min-width:1420px}#unitTable th,#unitTable td{white-space:nowrap}#unitTable th:nth-child(3),#unitTable td:nth-child(3){min-width:110px}#unitTable th:nth-child(n+4),#unitTable td:nth-child(n+4){text-align:right}#unitTable th:nth-child(-n+3),#unitTable td:nth-child(-n+3){text-align:left}
-
-#unitTable{border-collapse:separate;border-spacing:0;min-width:1750px;table-layout:fixed}
-#unitTable th,#unitTable td{box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-bottom:1px solid #26324a}
-#unitTable thead th{position:sticky;top:0;z-index:4;background:#111827}
-#unitTable th:nth-child(1),#unitTable td:nth-child(1){width:95px;min-width:95px;max-width:95px;position:sticky;left:0;z-index:3;background:#111827}
-#unitTable th:nth-child(2),#unitTable td:nth-child(2){width:100px;min-width:100px;max-width:100px;position:sticky;left:95px;z-index:3;background:#111827}
-#unitTable th:nth-child(3),#unitTable td:nth-child(3){width:105px;min-width:105px;max-width:105px;position:sticky;left:195px;z-index:3;background:#111827}
-#unitTable th:nth-child(4),#unitTable td:nth-child(4){width:280px;min-width:280px;max-width:280px;text-align:left}
-#unitTable th:nth-child(n+5),#unitTable td:nth-child(n+5){width:105px;min-width:105px;max-width:105px;text-align:right}
-#unitTable tbody tr:nth-child(even) td:not(:nth-child(-n+3)){background:#0f172a}
-#unitTable tbody tr:hover td{background:#1e293b!important}
-#unitTable td.na{color:#94a3b8;text-align:center}
-
-.filterbar{position:sticky;top:0;z-index:20;background:#0b1020;border:1px solid #263552;border-radius:14px;padding:12px 14px;margin:0 0 14px;display:flex;gap:12px;align-items:end;flex-wrap:wrap;box-shadow:0 8px 24px #0005}.filterbar label{font-size:12px;color:#94a3b8;font-weight:700}.filterbar select,.filterbar input{display:block;margin-top:5px;background:#111827;color:#edf2ff;border:1px solid #334155;border-radius:9px;padding:8px 10px}.filterbar .status{margin-left:auto;min-width:260px}.filterbar .status b{color:#e5e7eb}.custom-dates{display:none;gap:8px;align-items:end}.custom-dates.show{display:flex}
+:root{--bg:#f5f7fb;--panel:#fff;--panel2:#f8fafc;--text:#24324a;--muted:#7b879d;--line:#e5eaf2;--good:#43b889;--bad:#ef6b7a;--warn:#e9a84b;--accent:#5b86e5;--accent2:#8b79d1;--softblue:#edf4ff;--softgreen:#edf9f4;--softorange:#fff5e8;--softpurple:#f4f0ff;--shadow:0 8px 28px rgba(39,56,86,.07)}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif;padding-left:220px}header{position:sticky;top:0;z-index:15;background:rgba(255,255,255,.92);border-bottom:1px solid var(--line);padding:17px 28px;backdrop-filter:blur(12px)}h1{margin:0;font-size:24px;color:#263653}.sub{color:var(--muted);margin-top:3px}.wrap{padding:22px 28px 40px;max-width:1700px;margin:auto}.tabs{position:fixed;left:0;top:0;bottom:0;width:220px;background:#fff;border-right:1px solid var(--line);padding:86px 14px 20px;display:flex;flex-direction:column;gap:6px;z-index:20;overflow:auto}.tabs:before{content:'Octopusland';position:absolute;top:24px;left:24px;font-size:20px;font-weight:800;color:#365eaf}.tabs button,button{background:transparent;color:#5e6c84;border:0;padding:10px 12px;border-radius:10px;cursor:pointer;text-align:left;font-weight:600}.tabs button:hover{background:#f4f7fc}.tabs button.active{background:#eaf2ff;color:#3767c7}.grid{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}.k{color:var(--muted);font-size:12px;font-weight:650}.v{font-size:23px;font-weight:780;margin-top:5px;color:#24324a}.small{font-size:12px;color:var(--muted)}section{display:none}section.active{display:block}h2{margin:26px 0 12px;font-size:18px;color:#2d3b55}h3{color:#33415d}.note{padding:12px 15px;border:1px solid #f0dfbd;background:#fff9ed;border-radius:12px;color:#8b672a;margin:12px 0}table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}th,td{padding:10px 11px;border-bottom:1px solid #edf0f5;text-align:right;white-space:nowrap;vertical-align:middle}th{position:sticky;top:0;background:#f8fafc;color:#718096;font-size:11px;z-index:4}th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}tr:last-child td{border-bottom:0}.scroll{overflow:auto;max-height:650px;border-radius:14px}.good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}.muted{color:var(--muted)}.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}input,select{background:#fff;color:#34435e;border:1px solid #dfe5ee;padding:8px 10px;border-radius:9px;outline:none}.filterbar{position:sticky;top:84px;z-index:12;background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin:0 0 18px;display:flex;gap:12px;align-items:end;flex-wrap:wrap;box-shadow:var(--shadow);backdrop-filter:blur(8px)}.filterbar label{font-size:11px;color:#8792a6;font-weight:700}.filterbar select,.filterbar input{display:block;margin-top:4px}.filterbar .status{margin-left:auto;min-width:260px}.custom-dates{display:none;gap:8px;align-items:end}.custom-dates.show{display:flex}
+#kpis .card:nth-child(1){background:var(--softblue)}#kpis .card:nth-child(2){background:var(--softgreen)}#kpis .card:nth-child(3){background:var(--softorange)}#kpis .card:nth-child(4){background:var(--softpurple)}#kpis .card:nth-child(5){background:#eef8ff}#kpis .card:nth-child(6){background:#f6f7fb}
+.visual-grid{display:grid;grid-template-columns:1.7fr 1fr;gap:16px;margin-top:16px}.chart-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);min-height:310px}.chart-title{font-size:15px;font-weight:750;margin-bottom:4px}.chart-sub{font-size:12px;color:var(--muted);margin-bottom:16px}.chart-svg{width:100%;height:220px;display:block}.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;color:#6d7890;font-size:12px}.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}.products-card{margin-top:16px}.product-row{display:grid;grid-template-columns:minmax(140px,1fr) 3fr 90px;gap:12px;align-items:center;margin:13px 0}.product-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#56637a}.product-track{height:10px;background:#eef2f7;border-radius:999px;overflow:hidden}.product-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#7ca5ef,#6f87df)}.product-val{text-align:right;font-weight:700;color:#3a4965}
+#unitTable{border-collapse:separate;border-spacing:0;min-width:1750px;table-layout:fixed}#unitTable th,#unitTable td{box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#unitTable th:nth-child(1),#unitTable td:nth-child(1){width:95px;position:sticky;left:0;z-index:3;background:#fff}#unitTable th:nth-child(2),#unitTable td:nth-child(2){width:100px;position:sticky;left:95px;z-index:3;background:#fff}#unitTable th:nth-child(3),#unitTable td:nth-child(3){width:105px;position:sticky;left:195px;z-index:3;background:#fff}#unitTable th:nth-child(4),#unitTable td:nth-child(4){width:280px;text-align:left}#unitTable th:nth-child(n+5),#unitTable td:nth-child(n+5){width:105px;text-align:right}#unitTable tbody tr:nth-child(even) td:not(:nth-child(-n+3)){background:#fbfcfe}#unitTable tbody tr:hover td{background:#f3f7fd!important}#unitTable td.na{color:#a3adbd;text-align:center}
+@media(max-width:1100px){body{padding-left:0}.tabs{position:static;width:auto;padding:10px 16px;flex-direction:row;overflow:auto;border-right:0;border-bottom:1px solid var(--line)}.tabs:before{display:none}header{position:static}.filterbar{top:0}.grid{grid-template-columns:repeat(2,1fr)}.visual-grid,.row2{grid-template-columns:1fr}.wrap{padding:16px}.product-row{grid-template-columns:120px 1fr 75px}}
+@media(max-width:600px){.grid{grid-template-columns:1fr 1fr}.v{font-size:18px}.chart-card{padding:14px}.filterbar .status{min-width:100%;margin-left:0}}
 </style></head>
 <body><header><h1>Octopusland — аналитика маркетплейсов</h1><div class="sub">Ozon + Яндекс Маркет · УСН 6% · данные встроены в файл · сентябрь частичный</div></header>
 <div class="wrap">
@@ -40,7 +22,10 @@ table{width:100%;border-collapse:separate;border-spacing:0;background:var(--pane
 <button data-tab="overview" class="active">Обзор</button><button data-tab="unit">Юнит-экономика</button><button data-tab="yandex">Яндекс</button><button data-tab="ozon">Ozon</button><button data-tab="current">Текущий период</button><button data-tab="stocks">Остатки и поставки</button><button data-tab="funnel">Воронка / Boost</button><button data-tab="bank">Деньги / расходы</button><button data-tab="upload">Загрузка данных</button><button data-tab="quality">Качество данных</button>
 </div>
 <section id="overview" class="active"><div class="note">Сентябрь незакрыт: Яндекс — заказы 01–20.09; финансовые документы Ozon в наборе закрыты за июль–август. Текущие Ozon-заказы и остатки используются как оперативные данные, но не подменяют закрытую финансовую реализацию.</div>
-<div class="grid" id="kpis"></div><h2>Финансы по площадкам и месяцам</h2><div class="scroll"><table id="summary"></table></div>
+<div class="grid" id="kpis"></div>
+<div class="visual-grid"><div class="chart-card"><div class="chart-title">Динамика выручки</div><div class="chart-sub">По месяцам и площадкам</div><div id="revenueChart"></div></div><div class="chart-card"><div class="chart-title">Выручка по площадкам</div><div class="chart-sub">Доля в выбранном периоде</div><div id="platformChart"></div></div></div>
+<div class="chart-card products-card"><div class="chart-title">Выручка по товарам</div><div class="chart-sub">Топ SKU в выбранном периоде</div><div id="productChart"></div></div>
+<h2>Финансы по площадкам и месяцам</h2><div class="scroll"><table id="summary"></table></div>
 <h2>Что важно</h2><div class="row2"><div class="card" id="insights"></div><div class="card"><div class="k">УСН</div><div class="v">6%</div><div class="small">считается от выручки в расчётной модели, отдельно от комиссий и логистики</div><br><div class="k">Банк, III квартал</div><div class="v" id="bankKpi"></div></div></div></section>
 <section id="unit"><h2>Юнит-экономика по SKU</h2><div class="note">Прибыль/маржа/ROI показываются только для SKU, где в твоей таблице есть себестоимость. Для остальных выручка и фактические услуги площадки показаны, но прибыль не выдумывается.</div><div class="scroll"><table id="unitTable"></table></div></section>
 <section id="yandex"><h2>Яндекс Маркет — фактические услуги по SKU</h2><div class="scroll"><table id="yTable"></table></div></section>
@@ -54,7 +39,7 @@ table{width:100%;border-collapse:separate;border-spacing:0;background:var(--pane
   <div class="card"><div class="k">Новые отчёты</div><div class="small" style="margin:8px 0 14px">Ozon: заказы, финансовые отчёты, остатки. Яндекс: заказы/статистика, услуги, Business Boost. Также — себестоимость и банковские расходы.</div>
     <label for="fileUpload" style="display:inline-block;padding:11px 16px;border-radius:10px;background:#2563eb;color:white;font-weight:700;cursor:pointer">Выбрать файлы</label>
     <input id="fileUpload" type="file" multiple accept=".csv,.xls,.xlsx" style="display:none">
-    <div id="uploadStatus" class="small" style="margin-top:12px">Файлы ещё не выбраны.</div>
+    <div id="uploadStatus" class="small" style="margin-top:12px">Файлы ещё не выбраны.</div><div id="xlsxStatus" class="small" style="margin-top:6px"></div>
   </div>
   <div class="card"><div class="k">Что распознаётся</div><div class="small" style="line-height:1.8">Ozon — orders / реализация / услуги и расходы / остатки<br>Яндекс — united orders / statistics / marketplace services / Business Boost<br>Octopusland — себестоимость<br>Банк — поступления, списания и операционные расходы</div></div>
 </div>
@@ -108,8 +93,21 @@ function unitDisplay(r,key){if(key==='platform'||key==='month'||key==='sku'||key
 const unitColumns=[['platform','Площадка'],['month','Месяц'],['sku','SKU'],['name','Товар'],['qty','Продано'],['revenue','Выручка'],['cost_unit','Себес/шт'],['cogs','Себестоимость'],['fees','Расходы МП'],['tax','УСН 6%'],['profit','Прибыль'],['profit_unit','Прибыль/шт'],['margin','Маржа'],['roi','ROI']];
 function table(el,headers,rows){document.getElementById(el).innerHTML='<thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'+rows.join('')+'</tbody>'}
 function renderUnitTable(u){const t=document.getElementById('unitTable');t.replaceChildren();const cg=document.createElement('colgroup');unitColumns.forEach(()=>cg.appendChild(document.createElement('col')));t.appendChild(cg);const thead=document.createElement('thead'),hr=document.createElement('tr');unitColumns.forEach(([,label])=>{const th=document.createElement('th');th.textContent=label;hr.appendChild(th)});thead.appendChild(hr);t.appendChild(thead);const tbody=document.createElement('tbody');u.forEach((r,idx)=>{const tr=document.createElement('tr');tr.dataset.row=String(idx);unitColumns.forEach(([key])=>{const td=document.createElement('td'),v=unitDisplay(r,key);td.textContent=v;td.dataset.field=key;if(v==='—')td.classList.add('na');if(key==='name')td.title=r.name||'';tr.appendChild(td)});tbody.appendChild(tr)});t.appendChild(tbody)}
+function renderOverviewCharts(u){
+ const months=[...new Set(u.map(r=>normMonth(r.month)))].sort();
+ const plats=['Ozon','Яндекс'];
+ const byMonth=months.map(m=>({m,...Object.fromEntries(plats.map(p=>[p,u.filter(r=>normMonth(r.month)===m&&r.platform===p).reduce((a,r)=>a+(+r.revenue||0),0)]))}));
+ const max=Math.max(1,...byMonth.flatMap(x=>plats.map(p=>x[p]))), W=720,H=220,pad=34, iw=W-pad*2, ih=H-55;
+ const pts=(p)=>byMonth.map((x,i)=>{const xx=pad+(byMonth.length<2?iw/2:i*iw/(byMonth.length-1));const yy=15+ih-(x[p]/max)*ih;return [xx,yy]}).map(a=>a.join(',')).join(' ');
+ const labels=byMonth.map((x,i)=>{const xx=pad+(byMonth.length<2?iw/2:i*iw/(byMonth.length-1));return `<text x="${xx}" y="205" text-anchor="middle" font-size="11" fill="#8a96aa">${x.m}</text>`}).join('');
+ document.getElementById('revenueChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" class="chart-svg"><line x1="${pad}" y1="180" x2="${W-pad}" y2="180" stroke="#e9edf4"/><polyline points="${pts('Ozon')}" fill="none" stroke="#668de3" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><polyline points="${pts('Яндекс')}" fill="none" stroke="#7cc8a6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>${labels}</svg><div class="legend"><span><i class="dot" style="background:#668de3"></i>Ozon</span><span><i class="dot" style="background:#7cc8a6"></i>Яндекс</span></div>`;
+ const totals=plats.map(p=>[p,u.filter(r=>r.platform===p).reduce((a,r)=>a+(+r.revenue||0),0)]), grand=totals.reduce((a,x)=>a+x[1],0)||1, oz=totals[0][1]/grand*100;
+ document.getElementById('platformChart').innerHTML=`<div style="display:grid;place-items:center;height:220px"><div style="width:170px;height:170px;border-radius:50%;background:conic-gradient(#668de3 0 ${oz}%,#7cc8a6 ${oz}% 100%);position:relative"><div style="position:absolute;inset:28px;border-radius:50%;background:white;display:grid;place-items:center;text-align:center"><div><b style="font-size:22px">${rub(grand)}</b><div class="small">выручка</div></div></div></div></div><div class="legend"><span><i class="dot" style="background:#668de3"></i>Ozon ${pct(oz)}</span><span><i class="dot" style="background:#7cc8a6"></i>Яндекс ${pct(100-oz)}</span></div>`;
+ const sku={};u.forEach(r=>{sku[r.sku]=(sku[r.sku]||0)+(+r.revenue||0)});const top=Object.entries(sku).sort((a,b)=>b[1]-a[1]).slice(0,7), mx=Math.max(1,...top.map(x=>x[1]));document.getElementById('productChart').innerHTML=top.map(([k,v])=>`<div class="product-row"><div class="product-label" title="${esc(k)}">${esc(k)}</div><div class="product-track"><div class="product-fill" style="width:${v/mx*100}%"></div></div><div class="product-val">${rub(v)}</div></div>`).join('')||'<div class="small">Нет данных за выбранный период</div>';
+}
 function renderFinance(){
  const u=filterUnits(), sum=filterSummary();
+ renderOverviewCharts(u);
  const rev=total(u,'revenue'),fees=total(u,'fees'),tax=total(u,'tax'),qty=total(u,'qty'),known=u.filter(r=>r.profit!=null),profit=total(known,'profit'),knownRev=total(known,'revenue');
  document.getElementById('kpis').innerHTML=[['Выручка',rub(rev)],['Продано',num(qty)+' шт.'],['Расходы площадок',rub(fees)],['УСН 6%',rub(tax)],['Прибыль по SKU с себесом',rub(profit)],['Покрытие себестоимостью',rev?pct(knownRev/rev*100):'—']].map(x=>`<div class="card"><div class="k">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
  table('summary',['Площадка','Месяц','Выручка','Продано','Расходы МП','УСН','Покрытие себесом','Прибыль*'],sum.map(r=>`<tr><td>${r.platform}</td><td>${r.month}</td><td>${rub(r.revenue)}</td><td>${num(r.qty)}</td><td>${rub(r.fees)}</td><td>${rub(r.tax)}</td><td>${pct(r.coverage)}</td><td>${rub(r.profit_known)}</td></tr>`));
@@ -162,25 +160,288 @@ document.getElementById('qualityBox').innerHTML=q;
 
 
 function csvParse(text){const rows=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'){if(q&&n==='"'){cell+='"';i++;}else q=!q;}else if(c===','&&!q){row.push(cell);cell='';}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&n==='\n')i++;row.push(cell);cell='';if(row.some(x=>x!==''))rows.push(row);row=[];}else cell+=c;}if(cell||row.length){row.push(cell);rows.push(row)}return rows}
-function detectUpload(name,headers){const n=name.toLowerCase(),h=headers.join(' ').toLowerCase();if(h.includes('номер заказа')&&h.includes('артикул')&&h.includes('кластер'))return 'Ozon · заказы';if(h.includes('ваш sku')&&(h.includes('остаток')||h.includes('доступно')||h.includes('на складе')))return 'Яндекс · остатки';if(h.includes('ваш sku')&&(h.includes('стоимость услуги')||h.includes('название услуги')))return 'Яндекс · услуги';if(h.includes('ваш sku')&&(h.includes('сумма заказа')||h.includes('заказано')))return 'Яндекс · заказы/статистика';if(h.includes('доступно')&&h.includes('кластер')&&h.includes('sku'))return 'Ozon · остатки';if(n.includes('boost')||h.includes('буст'))return 'Яндекс · Business Boost';if(h.includes('себестоим')||h.includes('закуп'))return 'Себестоимость';if(h.includes('списан')||h.includes('поступлен')||h.includes('назначение платежа'))return 'Банк / расходы';if(h.includes('вознаграждение ozon')||h.includes('реализовано'))return 'Ozon · финансы';return 'Не определён автоматически'}
-async function inspectFile(f){let rows=[];if(f.name.toLowerCase().endsWith('.csv')){let t=await f.text();rows=csvParse(t)}else{if(typeof XLSX==='undefined')throw new Error('Не загрузилась библиотека XLSX');const b=await f.arrayBuffer(),w=XLSX.read(b,{type:'array'}),sh=w.Sheets[w.SheetNames[0]];rows=XLSX.utils.sheet_to_json(sh,{header:1,defval:''})}let hi=0;for(let i=0;i<Math.min(rows.length,30);i++){const z=rows[i].map(x=>String(x).trim());if(z.filter(Boolean).length>2){hi=i;break}}const headers=(rows[hi]||[]).map(x=>String(x).trim());return {name:f.name,type:detectUpload(f.name,headers),rows:Math.max(0,rows.length-hi-1),headers}}
+function detectUpload(name,headers,sheetName=''){const n=name.toLowerCase().replace(/ё/g,'е'),h=headers.join(' ').toLowerCase().replace(/ё/g,'е'),sn=sheetName.toLowerCase().replace(/ё/g,'е'); if((n.includes('начислен')||sn.includes('начислен'))&&n.includes('отчет'))return 'Ozon · начисления'; if((n.includes('логистик')||sn.includes('логистик'))&&n.includes('отчет'))return 'Ozon · логистика';
+if(h.includes('номер заказа')&&h.includes('артикул')&&h.includes('кластер'))return 'Ozon · заказы';
+if(h.includes('ваш sku')&&(h.includes('остаток')||h.includes('доступно')||h.includes('на складе')))return 'Яндекс · остатки';
+if(h.includes('ваш sku')&&(h.includes('стоимость услуги')||h.includes('название услуги')))return 'Яндекс · услуги';
+if(h.includes('ваш sku')&&(h.includes('сумма заказа')||h.includes('заказано')))return 'Яндекс · заказы/статистика';
+if(h.includes('доступно')&&h.includes('кластер')&&h.includes('sku'))return 'Ozon · остатки';
+if(n.includes('boost')||h.includes('буст'))return 'Яндекс · Business Boost';
+if(h.includes('себестоим')||h.includes('закуп'))return 'Себестоимость';
+if(h.includes('списан')||h.includes('поступлен')||h.includes('назначение платежа'))return 'Банк / расходы';
+if(h.includes('id начисления')&&h.includes('группа услуг')&&h.includes('тип начисления')&&h.includes('сумма итого'))return 'Ozon · начисления';
+if(h.includes('id начисления')&&h.includes('кластер отправки')&&h.includes('кластер назначения')&&h.includes('сумма итого'))return 'Ozon · логистика';
+if(h.includes('вознаграждение ozon')||h.includes('реализовано')||n.includes('отчет о реализации товара'))return 'Ozon · финансы/реализация';
+if(n.includes('united_netting')||sn.includes('отчёт о платежах')||sn.includes('отчет о платежах'))return 'Яндекс · отчёт о платежах';
+return 'Не определён автоматически'}
+function findHeaderRow(rows){let best={i:0,score:-1};for(let i=0;i<Math.min(rows.length,150);i++){const z=(rows[i]||[]).map(x=>String(x).trim()), non=z.filter(Boolean);if(non.length<2)continue;const words=non.join(' ').toLowerCase();let score=non.length+(words.match(/sku|артикул|заказ|сумм|дата|услуг|комисс|товар|колич|остат|реализ|платеж/g)||[]).length*3;if(score>best.score)best={i,score}}return best.i}
+async function inspectFile(f){const buf=await f.arrayBuffer();if(f.name.toLowerCase().endsWith('.csv')){const rows=csvParse(new TextDecoder().decode(buf)),hi=findHeaderRow(rows),headers=(rows[hi]||[]).map(x=>String(x).trim());return {name:f.name,type:detectUpload(f.name,headers,'CSV'),rows:Math.max(0,rows.length-hi-1),headers,sheet:'CSV',headerRow:hi,sheets:[{name:'CSV',headerRow:hi,headers,rows:Math.max(0,rows.length-hi-1)}]}}
+if(typeof XLSX==='undefined')throw new Error('Модуль Excel XLSX не загрузился. Проверь интернет и обнови страницу, затем выбери файл ещё раз.');const w=XLSX.read(buf,{type:'array'}),sheets=[];for(const sheet of w.SheetNames){const rows=XLSX.utils.sheet_to_json(w.Sheets[sheet],{header:1,defval:'',raw:false});const hi=findHeaderRow(rows),headers=(rows[hi]||[]).map(x=>String(x).trim()),type=detectUpload(f.name,headers,sheet);sheets.push({name:sheet,headerRow:hi,headers,rows:Math.max(0,rows.length-hi-1),type})}const known=sheets.find(x=>x.type!=='Не определён автоматически')||sheets.sort((a,b)=>b.headers.filter(Boolean).length-a.headers.filter(Boolean).length)[0];return {name:f.name,type:known?.type||'Не определён автоматически',rows:sheets.reduce((a,x)=>a+x.rows,0),headers:known?.headers||[],sheet:known?.name||'',headerRow:known?.headerRow||0,sheets}}
 
-// Накопительная база новых отчётов. Базовый объект D остаётся неизменяемой ретроисторией.
+// Постоянная база Supabase. В браузере храним только резервную локальную копию.
+const SUPABASE_URL='https://jwyjkcncgxwexgnlihcw.supabase.co';
+const SUPABASE_KEY='sb_publishable_46wzwaPEzFUFxlnpirjw4Q_8mZDpbjW';
+const SB_HEADERS={
+  'apikey':SUPABASE_KEY,
+  'Authorization':'Bearer '+SUPABASE_KEY,
+  'Content-Type':'application/json'
+};
+async function sbRequest(path,options={}){
+  const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
+    ...options,
+    headers:{...SB_HEADERS,...(options.headers||{})}
+  });
+  const text=await r.text();
+  let body=null;
+  if(text){try{body=JSON.parse(text)}catch{body=text}}
+  if(!r.ok){
+    const e=new Error(body?.message||body?.error||('HTTP '+r.status));
+    e.code=body?.code||String(r.status);
+    e.details=body?.details||'';
+    e.hint=body?.hint||'';
+    throw e;
+  }
+  return body;
+}
 const DB_NAME='octopusland_dashboard_db', DB_VER=1, STORE='reports';
 function openDb(){return new Promise((resolve,reject)=>{const r=indexedDB.open(DB_NAME,DB_VER);r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains(STORE))db.createObjectStore(STORE,{keyPath:'id'})};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
 function txReq(req){return new Promise((resolve,reject)=>{req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
-async function allReports(){const db=await openDb();const tx=db.transaction(STORE,'readonly');return await txReq(tx.objectStore(STORE).getAll())}
-async function putReport(x){const db=await openDb();const tx=db.transaction(STORE,'readwrite');await txReq(tx.objectStore(STORE).put(x))}
-async function clearReports(){const db=await openDb();const tx=db.transaction(STORE,'readwrite');await txReq(tx.objectStore(STORE).clear())}
+async function localReports(){const db=await openDb();return await txReq(db.transaction(STORE,'readonly').objectStore(STORE).getAll())}
+async function putLocal(x){const db=await openDb();await txReq(db.transaction(STORE,'readwrite').objectStore(STORE).put(x))}
 async function sha256(buf){const hash=await crypto.subtle.digest('SHA-256',buf);return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('')}
-function b64FromBuf(buf){let s='',u=new Uint8Array(buf),step=0x8000;for(let i=0;i<u.length;i+=step)s+=String.fromCharCode(...u.subarray(i,i+step));return btoa(s)}
-function bufFromB64(s){const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u.buffer}
 function fmtBytes(n){if(n<1024)return n+' Б';if(n<1048576)return (n/1024).toFixed(1)+' КБ';return (n/1048576).toFixed(1)+' МБ'}
-async function refreshArchive(){const a=await allReports();const ls=document.getElementById('uploadList'),sm=document.getElementById('dbSummary');const bytes=a.reduce((z,r)=>z+(r.size||0),0);sm.innerHTML=`Сохранено новых отчётов: <b>${a.length}</b><br>Объём: <b>${fmtBytes(bytes)}</b><br>Хранилище: <b>IndexedDB этого браузера</b>`;if(!a.length){ls.textContent='Пока новых отчётов нет.';return}a.sort((x,y)=>(y.addedAt||'').localeCompare(x.addedAt||''));ls.innerHTML=a.map(r=>`<div style="padding:8px 0;border-bottom:1px solid #23304a"><b>${esc(r.name)}</b> — ${esc(r.type)} · ${num(r.rows)} строк · ${fmtBytes(r.size||0)}<br><span style="color:#94a3b8">добавлен ${new Date(r.addedAt).toLocaleString('ru-RU')} · ID ${r.id.slice(0,10)}…</span></div>`).join('')}
-async function saveIncomingFile(f){const buf=await f.arrayBuffer(),id=await sha256(buf),existing=(await allReports()).find(r=>r.id===id);if(existing)return {...existing,duplicate:true};const meta=await inspectFile(new File([buf],f.name,{type:f.type,lastModified:f.lastModified}));const rec={id,name:f.name,type:meta.type,rows:meta.rows,headers:meta.headers,size:buf.byteLength,lastModified:f.lastModified||null,addedAt:new Date().toISOString(),mime:f.type||'',data:b64FromBuf(buf)};await putReport(rec);return {...rec,duplicate:false}}
-const fu=document.getElementById('fileUpload');if(fu)fu.addEventListener('change',async e=>{const files=[...e.target.files],st=document.getElementById('uploadStatus');st.textContent='Сохраняю '+files.length+' файл(а/ов)…';let added=0,dups=0,errs=0;for(const f of files){try{const x=await saveIncomingFile(f);x.duplicate?dups++:added++}catch(err){errs++;console.error(err)}}await refreshArchive();st.textContent=`Готово: добавлено ${added}, дублей пропущено ${dups}${errs?', ошибок '+errs:''}. Ретроданные сайта не изменены.`;e.target.value=''});
-document.getElementById('exportDb').addEventListener('click',async()=>{const reports=await allReports();const payload={format:'octopusland-dashboard-backup',version:1,exportedAt:new Date().toISOString(),reports};const blob=new Blob([JSON.stringify(payload)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='octopusland_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
-document.getElementById('importDb').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const p=JSON.parse(await f.text());if(p.format!=='octopusland-dashboard-backup'||!Array.isArray(p.reports))throw new Error('Это не резервная копия Octopusland');let add=0,skip=0;const old=new Set((await allReports()).map(x=>x.id));for(const r of p.reports){if(old.has(r.id)){skip++;continue}await putReport(r);old.add(r.id);add++}await refreshArchive();document.getElementById('uploadStatus').textContent=`Импорт базы: добавлено ${add}, уже существовало ${skip}.`;}catch(err){alert('Не удалось импортировать базу: '+err.message)}e.target.value=''});
-document.getElementById('clearAdded').addEventListener('click',async()=>{if(!confirm('Удалить только отчёты, добавленные через загрузчик? Встроенная ретроистория останется в дашборде.'))return;await clearReports();await refreshArchive();document.getElementById('uploadStatus').textContent='Добавленные отчёты удалены. Встроенная ретроистория сохранена.'});
-refreshArchive().catch(err=>{document.getElementById('dbSummary').textContent='Не удалось открыть локальную базу: '+err.message});
+async function cloudReports(){return await sbRequest('uploads?select=*&order=created_at.desc')||[]}
+async function refreshArchive(){const ls=document.getElementById('uploadList'),sm=document.getElementById('dbSummary');try{const a=await cloudReports();sm.innerHTML=`Сохранено отчётов в Supabase: <b>${a.length}</b><br>Хранилище: <b>облачная база Octopusland</b><br>Доступно с любого устройства`;if(!a.length){ls.textContent='Пока новых отчётов нет.';return}ls.innerHTML=a.map(r=>`<div style="padding:8px 0;border-bottom:1px solid #23304a"><b>${esc(r.file_name)}</b> — ${esc(r.report_type||'не определён')}<br><span style="color:#94a3b8">${esc(r.marketplace||'')} · добавлен ${new Date(r.created_at).toLocaleString('ru-RU')} · ${esc(r.status||'')}</span></div>`).join('')}catch(err){const a=await localReports();sm.innerHTML=`Supabase недоступен: <b>${esc(err.message)}</b><br>Локальная резервная копия: <b>${a.length}</b>`;ls.textContent=a.length?'Есть локальные копии отчётов.':'Пока новых отчётов нет.'}}
+function marketFromType(t){return t.startsWith('Ozon')?'Ozon':t.startsWith('Яндекс')?'Яндекс':t==='Себестоимость'?'Octopusland':t.startsWith('Банк')?'Банк':null}
+function cleanNum(v){if(v==null||v==='')return null;const n=Number(String(v).replace(/\s/g,'').replace(',','.'));return Number.isFinite(n)?n:null}
+function ruDate(v){if(!v)return null;const m=String(v).match(/(\d{2})\.(\d{2})\.(\d{4})/);return m?`${m[3]}-${m[2]}-${m[1]}`:null}
+function anyDate(v){const r=ruDate(v);if(r)return r;const n=Number(v);if(Number.isFinite(n)&&n>30000&&n<80000){const d=new Date(Date.UTC(1899,11,30)+n*86400000);return d.toISOString().slice(0,10)}const iso=String(v||'').match(/(20\d{2})-(\d{2})-(\d{2})/);return iso?iso[0]:null}
+function monthStart(d){return d?d.slice(0,7)+'-01':null}
+function rowsToObjects(rows,headerIndex){const h=(rows[headerIndex]||[]).map(x=>String(x||'').trim());return rows.slice(headerIndex+1).filter(r=>r.some(x=>String(x||'').trim()!=='')).map(r=>Object.fromEntries(h.map((k,i)=>[k||('_'+i),r[i]??''])))}
+function extractPeriod(text){const m=String(text||'').match(/(?:с\s*)?(\d{2}\.\d{2}\.\d{4})\s*(?:по|-|–)\s*(\d{2}\.\d{2}\.\d{4})/i);return m?{from:ruDate(m[1]),to:ruDate(m[2])}:{from:null,to:null}}
+async function parseMarketplaceFile(f,buf,meta){
+  if(typeof XLSX==='undefined')throw new Error('Модуль Excel XLSX не загрузился. Проверь интернет и обнови страницу, затем выбери файл ещё раз.');
+  const w=XLSX.read(buf,{type:'array'}), out=[]; let period={from:null,to:null};
+  if(meta.type==='Яндекс · отчёт о платежах'){
+    const sumName=w.SheetNames.find(n=>n.toLowerCase().includes('свод'));
+    if(sumName){const sr=XLSX.utils.sheet_to_json(w.Sheets[sumName],{header:1,defval:'',raw:false});period=extractPeriod((sr.flat().find(x=>String(x).includes('Отчёт о платежах за период'))||''));}
+    const sn=w.SheetNames.find(n=>n.toLowerCase().includes('платеж'))||meta.sheet;
+    const rows=XLSX.utils.sheet_to_json(w.Sheets[sn],{header:1,defval:'',raw:false});
+    const hi=rows.findIndex(r=>r.some(x=>String(x).trim()==='Дата транзакции')&&r.some(x=>String(x).trim()==='Ваш SKU'));
+    if(hi<0)throw new Error('В отчёте Яндекс не найдена строка заголовков платежей');
+    const objs=rowsToObjects(rows,hi);
+    for(const r of objs){
+      const d=ruDate(r['Дата транзакции']), amount=cleanNum(r['Сумма транзакции, ₽']), qty=cleanNum(r['Количество']); if(!d||amount==null)continue;
+      const type=String(r['Тип транзакции']||'').toLowerCase(), source=String(r['Источник транзакции']||'').toLowerCase(), desc=String(r['Название товара (к начислению) или услуги (к удержанию)\n']||r['Название товара (к начислению) или услуги (к удержанию)']||'');
+      const isRevenue=type.includes('начисл')&&(source.includes('плат')||String(r['Тип заказа']||'').toLowerCase().includes('продаж'));
+      const expense=type.includes('удерж')?Math.abs(amount):0; const dl=desc.toLowerCase();
+      out.push({marketplace:'Яндекс',report_type:meta.type,operation_date:d,month:monthStart(d),sku:String(r['Ваш SKU']||'').trim()||null,product_name:desc||null,order_id:String(r['Ваш номер заказа']||r['Номер заказа или отгрузки']||'').trim()||null,quantity:qty,revenue:isRevenue?Math.abs(amount):0,commission:dl.includes('размещен')?expense:0,logistics:(dl.includes('достав')||dl.includes('миля'))?expense:0,storage:dl.includes('хран')?expense:0,advertising:(dl.includes('буст')||dl.includes('продвиж'))?expense:0,returns:(dl.includes('возврат')||dl.includes('невыкуп'))?expense:0,other_expenses:expense,payout:null,raw_data:r});
+    }
+  } else if(meta.type==='Ozon · начисления'){
+    const sn=(meta.sheet&&w.Sheets[meta.sheet])?meta.sheet:(w.SheetNames.find(n=>n.toLowerCase().includes('начис'))||w.SheetNames[0]);
+    const rows=XLSX.utils.sheet_to_json(w.Sheets[sn],{header:1,defval:'',raw:false,blankrows:true});
+    period=extractPeriod(rows.slice(0,10).flat().join(' '));
+    // В актуальном отчёте Ozon строка 1 содержит период, строка 2 — заголовки.
+    // Берём её напрямую: так парсер не зависит от особенностей merged-cells/версии SheetJS в браузере.
+    let hi=rows.length>1?1:-1;
+    if(hi<0)throw new Error('Отчёт Ozon по начислениям пустой или повреждён');
+    const objs=rowsToObjects(rows,hi);
+    for(const r of objs){
+      const d=anyDate(r['Дата начисления'])||period.to;
+      const amount=cleanNum(r['Сумма итого, руб.']); if(amount==null)continue;
+      const group=String(r['Группа услуг']||'').trim(), type=String(r['Тип начисления']||'').trim(), tl=type.toLowerCase(), gl=group.toLowerCase();
+      const sku=String(r['SKU']||'').trim()||null, offer=String(r['Артикул']||'').trim()||null;
+      const expense=amount<0?Math.abs(amount):0;
+      let commission=0,logistics=0,storage=0,advertising=0,returns=0,other=0;
+      if(expense){
+        if(gl.includes('вознаграждение ozon')||tl.includes('вознаграждение за продажу')) commission=expense;
+        else if(tl.includes('логист')||tl.includes('доставка до места выдачи')||gl.includes('услуги доставки')) logistics=expense;
+        else if(tl.includes('хран')) storage=expense;
+        else if(gl.includes('продвиж')||tl.includes('продвиж')||tl.includes('реклам')) advertising=expense;
+        else if(tl.includes('возврат')||tl.includes('невыкуп')) returns=expense;
+        else other=expense;
+      }
+      // Выручку здесь не дублируем: её источником остаётся отчёт реализации.
+      out.push({marketplace:'Ozon',report_type:meta.type,operation_date:d,month:monthStart(d),sku,offer_id:offer,product_name:String(r['Название товара']||'').trim()||null,order_id:String(r['ID начисления']||'').trim()||null,quantity:0,revenue:0,commission,logistics,storage,advertising,returns,other_expenses:other,payout:amount,raw_data:{group,type,amount,seller_price:cleanNum(r['Цена продавца']),quantity:cleanNum(r['Количество']),platform:r['Платформа продажи'],scheme:r['Схема работы']}});
+    }
+  } else if(meta.type==='Ozon · логистика'){
+    const sn=(meta.sheet&&w.Sheets[meta.sheet])?meta.sheet:(w.SheetNames.find(n=>n.toLowerCase().includes('логист'))||w.SheetNames[0]);
+    const rows=XLSX.utils.sheet_to_json(w.Sheets[sn],{header:1,defval:'',raw:false,blankrows:true});
+    period=extractPeriod(rows.slice(0,10).flat().join(' '));
+    // В актуальном отчёте Ozon строка 1 содержит период, строка 2 — заголовки.
+    let hi=rows.length>1?1:-1;
+    if(hi<0)throw new Error('Отчёт Ozon по логистике пустой или повреждён');
+    const objs=rowsToObjects(rows,hi);
+    for(const r of objs){
+      const d=anyDate(r['Дата начисления'])||period.to, amount=cleanNum(r['Сумма итого, руб.']); if(amount==null)continue;
+      out.push({marketplace:'Ozon',report_type:meta.type,operation_date:d,month:monthStart(d),sku:String(r['SKU']||'').trim()||null,offer_id:String(r['Артикул']||'').trim()||null,product_name:String(r['Название товара']||'').trim()||null,order_id:String(r['ID начисления']||'').trim()||null,quantity:cleanNum(r['Количество'])||0,revenue:0,commission:0,logistics:0,storage:0,advertising:0,returns:0,other_expenses:0,payout:amount,raw_data:{type:r['Тип начисления'],cost:cleanNum(r['Стоимость']),nonlocal_markup:cleanNum(r['Наценка за нелокальность']),cluster_from_tariff:r['Кластер отправки (тарифицируемый)'],cluster_from_actual:r['Кластер отправки (фактический)'],cluster_to:r['Кластер назначения'],volume:cleanNum(r['Объём']),scheme:r['Схема работы']}});
+    }
+    // Этот отчёт — детализация. Суммы логистики в юнитке берём из "Начислений", чтобы не задваивать расходы.
+  } else if(meta.type==='Ozon · финансы/реализация'){
+    // Ozon's realization report has a two-row header. Do not assume a fixed row number
+    // or sheet name: locate the row containing Product name / Article / SKU / Realized.
+    const sn=(meta.sheet&&w.Sheets[meta.sheet])?meta.sheet:(w.SheetNames.find(n=>n.toLowerCase().includes('реализа'))||w.SheetNames[0]);
+    const rows=XLSX.utils.sheet_to_json(w.Sheets[sn],{header:1,defval:'',raw:false,blankrows:true});
+    period=extractPeriod(rows.slice(0,20).flat().join(' '));
+    // Fallback for Ozon XLSX files whose merged header cells are lost by SheetJS.
+    // First try the filename YYYYMMDD (report date), then default the period to that calendar month.
+    if(!period.to){
+      const fm=String(f.name||'').match(/(20\d{2})(\d{2})(\d{2})/);
+      if(fm){
+        const y=+fm[1],m=+fm[2],d=+fm[3];
+        const last=new Date(Date.UTC(y,m,0)).getUTCDate();
+        period={from:`${fm[1]}-${fm[2]}-01`,to:`${fm[1]}-${fm[2]}-${String(Math.min(d,last)).padStart(2,'0')}`};
+      }
+    }
+    const norm=v=>String(v??'').replace(/\s+/g,' ').trim().toLowerCase();
+    let hi=rows.findIndex(r=>{
+      const z=(r||[]).map(norm);
+      const joined=z.join(' | ');
+      return joined.includes('название товара') && joined.includes('артикул') &&
+             joined.includes('sku') && joined.includes('реализовано');
+    });
+    // Некоторые выгрузки Ozon формируют XLSX без координат ячеек в XML.
+    // В таких файлах SheetJS иногда не восстанавливает верхнюю строку шапки,
+    // поэтому используем безопасный fallback: находим первую товарную строку.
+    const firstData=rows.findIndex(r=>/^\d+$/.test(String((r||[])[0]??'').trim()) &&
+      String((r||[])[1]??'').trim() && String((r||[])[2]??'').trim() && String((r||[])[3]??'').trim());
+    if(hi<0 && firstData<0)throw new Error('В отчёте Ozon не найдены строки товаров. Первые строки файла прочитаны, но структура не восстановилась.');
+    const top=hi>=0?(rows[hi]||[]).map(norm):[], sub=hi>=0?(rows[hi+1]||[]).map(norm):[];
+    const idx=(arr,needle,fallback)=>{const j=arr.findIndex(x=>x===needle||x.includes(needle));return j>=0?j:fallback};
+    const nameCol=idx(top,'название товара',1), articleCol=idx(top,'артикул',2), skuCol=idx(top,'sku',3);
+    // Фактическая структура отчёта Ozon: B товар, C артикул, D SKU,
+    // F сумма реализации, H количество, J сумма возврата, L количество возврата.
+    const soldAmountCol=idx(sub,'реализовано на сумму',5);
+    const soldQtyCol=(()=>{for(let j=soldAmountCol;j<Math.min(sub.length,soldAmountCol+5);j++)if(sub[j].includes('кол-во')||sub[j].includes('количество'))return j;return 7})();
+    const returnAmountCol=idx(sub,'возвращено на сумму',9);
+    const returnQtyCol=(()=>{for(let j=returnAmountCol;j<Math.min(sub.length,returnAmountCol+5);j++)if(sub[j].includes('кол-во')||sub[j].includes('количество'))return j;return 11})();
+    const soldLoyaltyCol=6, returnLoyaltyCol=10;
+    const dataStart=hi>=0?hi+2:firstData;
+    for(let i=dataStart;i<rows.length;i++){
+      const r=rows[i]||[], rowNo=String(r[0]??'').trim();
+      if(!/^\d+$/.test(rowNo))continue;
+      const sold=cleanNum(r[soldAmountCol])||0, soldQty=cleanNum(r[soldQtyCol])||0;
+      const returned=cleanNum(r[returnAmountCol])||0, retQty=cleanNum(r[returnQtyCol])||0;
+      const soldLoyalty=cleanNum(r[soldLoyaltyCol])||0, returnLoyalty=cleanNum(r[returnLoyaltyCol])||0;
+      const article=String(r[articleCol]??'').trim(), ozonSku=String(r[skuCol]??'').trim();
+      out.push({marketplace:'Ozon',report_type:meta.type,operation_date:period.to,month:monthStart(period.to),sku:ozonSku||null,offer_id:article||null,product_name:String(r[nameCol]??'').trim()||null,order_id:null,quantity:soldQty-retQty,revenue:sold-returned,commission:0,logistics:0,storage:0,advertising:0,returns:returned,other_expenses:0,payout:soldLoyalty-returnLoyalty,raw_data:{row:r,article:article,ozon_sku:ozonSku,sold_amount:sold,sold_qty:soldQty,sold_loyalty:soldLoyalty,returned_amount:returned,returned_qty:retQty,return_loyalty:returnLoyalty,period_from:period.from,period_to:period.to}});
+    }
+    if(!out.length)throw new Error('Шапка Ozon найдена, но строки товаров не распознаны');
+  }
+  return {rows:out,period};
+}
+async function insertParsedRows(uploadId,parsed,force=false){
+  if(!parsed.rows.length)return 0;
+  if(!force){
+    const existing=await sbRequest('marketplace_data?select=id&upload_id=eq.'+encodeURIComponent(uploadId)+'&limit=1');
+    if(existing&&existing.length)return 0;
+  }
+  let count=0;
+  for(let i=0;i<parsed.rows.length;i+=250){
+    const batch=parsed.rows.slice(i,i+250).map(r=>({...r,upload_id:uploadId}));
+    await sbRequest('marketplace_data',{method:'POST',body:JSON.stringify(batch)});
+    count+=batch.length;
+  }
+  return count;
+}
+async function saveIncomingFile(f){
+  const buf=await f.arrayBuffer(),hash=await sha256(buf),fileObj=new File([buf],f.name,{type:f.type,lastModified:f.lastModified}),meta=await inspectFile(fileObj),parsed=await parseMarketplaceFile(fileObj,buf,meta);
+  const old=await sbRequest('uploads?select=id,file_name&file_hash=eq.'+encodeURIComponent(hash)+'&limit=1');
+  if(old&&old.length){const parsedRows=await insertParsedRows(old[0].id,parsed,false);return {duplicate:true,meta,parsedRows,period:parsed.period}}
+  const row={file_name:f.name,file_hash:hash,marketplace:marketFromType(meta.type),report_type:meta.type,period_from:parsed.period.from,period_to:parsed.period.to,status:meta.type==='Не определён автоматически'?'needs_recognition':'recognized',recognition_method:meta.type==='Не определён автоматически'?'pending_ai':'rules',recognition_confidence:meta.type==='Не определён автоматически'?null:0.95};
+  const data=await sbRequest('uploads',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)}),saved=Array.isArray(data)?data[0]:data;
+  const parsedRows=await insertParsedRows(saved.id,parsed);await putLocal({id:hash,name:f.name,type:meta.type,rows:meta.rows,headers:meta.headers,size:buf.byteLength,addedAt:new Date().toISOString(),uploadId:saved?.id});return {duplicate:false,meta,data:saved,parsedRows,period:parsed.period}
+}
+function describeUploadError(err){
+  if(!err)return 'Неизвестная ошибка';
+  const parts=[];
+  if(err.message)parts.push(err.message);
+  if(err.code)parts.push('code: '+err.code);
+  if(err.details)parts.push('details: '+err.details);
+  if(err.hint)parts.push('hint: '+err.hint);
+  return parts.join(' · ')||String(err);
+}
+const xs=document.getElementById('xlsxStatus');if(xs){xs.innerHTML=(typeof XLSX!=='undefined')?'<span style="color:#15803d">Excel-модуль готов</span>':'<span style="color:#b91c1c">Excel-модуль не загрузился — обнови страницу при включённом интернете</span>';}
+const fu=document.getElementById('fileUpload');if(fu)fu.addEventListener('change',async e=>{
+  const files=[...e.target.files],st=document.getElementById('uploadStatus');
+  st.innerHTML='Распознаю и сохраняю '+files.length+' файл(а/ов)…';
+  let added=0,dups=0,unknown=0,parsedRows=0;const errors=[];
+  for(const f of files){
+    try{
+      const x=await saveIncomingFile(f);
+      if(x.duplicate)dups++;else{added++;if(x.meta.type==='Не определён автоматически')unknown++} parsedRows+=x.parsedRows||0
+    }catch(err){
+      console.error('Ошибка загрузки '+f.name,err);
+      errors.push({name:f.name,message:describeUploadError(err)});
+    }
+  }
+  await refreshArchive();
+  await loadSupabaseIntoDashboard().catch(err=>console.warn('Dashboard reload after upload',err));
+  let html=`<b>Готово:</b> файлов добавлено ${added}, дублей ${dups}, строк данных записано <b>${parsedRows}</b>${unknown?', требуют ИИ-распознавания '+unknown:''}${errors.length?', ошибок '+errors.length:''}.`;
+  if(errors.length){
+    html+=`<div style="margin-top:10px;padding:10px;border:1px solid #7f1d1d;background:#2b1116;border-radius:9px;color:#fecaca"><b>Почему не загрузилось:</b>`+errors.map(x=>`<div style="margin-top:7px"><b>${esc(x.name)}</b><br><span style="user-select:text">${esc(x.message)}</span></div>`).join('')+`</div>`;
+  }
+  st.innerHTML=html;e.target.value='';
+});
+const exp=document.getElementById('exportDb');if(exp)exp.addEventListener('click',async()=>{const reports=await cloudReports();const blob=new Blob([JSON.stringify({format:'octopusland-supabase-backup',version:2,exportedAt:new Date().toISOString(),reports},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='octopusland_supabase_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
+const imp=document.getElementById('importDb');if(imp)imp.addEventListener('change',()=>alert('Импорт старой локальной базы временно отключён: сначала завершаем миграцию в Supabase.'));
+const clr=document.getElementById('clearAdded');if(clr){clr.textContent='Облачные данные не удалять';clr.disabled=true;clr.title='Удаление из Supabase отключено для защиты истории';}
+
+
+// === Supabase -> dashboard ===
+// Загруженные финансовые строки становятся частью юнит-экономики, а не только архива.
+async function loadSupabaseIntoDashboard(){
+  const badge=document.getElementById('dbSummary');
+  try{
+    const allRows=await sbRequest('marketplace_data?select=marketplace,report_type,operation_date,month,sku,offer_id,product_name,quantity,revenue,commission,logistics,storage,advertising,returns,other_expenses,payout&marketplace=eq.Ozon&order=operation_date.asc&limit=10000');
+    const oz=Array.isArray(allRows)?allRows:[];
+    const realization=oz.filter(r=>String(r.report_type||'').toLowerCase().includes('реализац'));
+    const accruals=oz.filter(r=>String(r.report_type||'').toLowerCase().includes('начислен'));
+    if(!realization.length){
+      if(badge)badge.innerHTML+=`<br><span style="color:#b45309">Supabase: строк реализации Ozon пока нет (${oz.length} строк Ozon всего)</span>`;
+      return;
+    }
+    const groups=new Map();
+    const getGroup=(r)=>{
+      let month=String(r.month||'').slice(0,7); if(!/^20\d\d-\d\d$/.test(month))month=String(r.operation_date||'').slice(0,7);
+      const sellerSku=String(r.offer_id||r.sku||'').trim(); if(!/^20\d\d-\d\d$/.test(month)||!sellerSku)return null;
+      const k=['Ozon',month,sellerSku].join('|');
+      if(!groups.has(k))groups.set(k,{platform:'Ozon',month,sku:sellerSku,name:r.product_name||'',qty:0,revenue:0,fees:0,tax:0,cost_unit:null,cogs:null,profit:null,margin:null,roi:null,commission:0,logistics:0,returns:0,fee_cats:{},_supabase:true});
+      return groups.get(k);
+    };
+    for(const r of realization){
+      const g=getGroup(r); if(!g)continue;
+      g.qty+=Number(r.quantity)||0; g.revenue+=Number(r.revenue)||0;
+      if(!g.name&&r.product_name)g.name=r.product_name;
+    }
+    for(const r of accruals){
+      const g=getGroup(r); if(!g)continue; // расходы без SKU сохраняются в базе, но не размазываются по товарам автоматически
+      const c=Number(r.commission)||0,l=Number(r.logistics)||0,st=Number(r.storage)||0,ad=Number(r.advertising)||0,ret=Number(r.returns)||0,o=Number(r.other_expenses)||0;
+      g.commission+=c;g.logistics+=l;g.returns+=ret;g.fees+=c+l+st+ad+ret+o;
+      g.fee_cats['Комиссия']=(g.fee_cats['Комиссия']||0)+c;
+      g.fee_cats['Логистика']=(g.fee_cats['Логистика']||0)+l;
+      g.fee_cats['Хранение']=(g.fee_cats['Хранение']||0)+st;
+      g.fee_cats['Реклама']=(g.fee_cats['Реклама']||0)+ad;
+      g.fee_cats['Возвраты']=(g.fee_cats['Возвраты']||0)+ret;
+      g.fee_cats['Прочее']=(g.fee_cats['Прочее']||0)+o;
+    }
+    const original=D.unit.filter(x=>!x._supabase); D.unit=original.slice();
+    for(const g of groups.values()){
+      const costRef=original.find(x=>x.sku===g.sku&&x.cost_unit!=null); if(costRef)g.cost_unit=Number(costRef.cost_unit);
+      g.tax=g.revenue*0.06;
+      if(g.cost_unit!=null){g.cogs=g.cost_unit*g.qty;g.profit=g.revenue-g.fees-g.tax-g.cogs;g.margin=g.revenue?g.profit/g.revenue*100:null;g.roi=g.cogs?g.profit/g.cogs*100:null;}
+      D.unit=D.unit.filter(x=>!(x.platform==='Ozon'&&normMonth(x.month)===g.month&&x.sku===g.sku)); D.unit.push(g);
+    }
+    renderFinance();
+    const septR=realization.filter(r=>String(r.month||r.operation_date||'').startsWith('2026-09')).length;
+    const septA=accruals.filter(r=>String(r.month||r.operation_date||'').startsWith('2026-09')).length;
+    if(badge)badge.innerHTML+=`<br><b>Supabase → дашборд:</b> реализация ${realization.length} строк (сентябрь ${septR}); начисления ${accruals.length} (сентябрь ${septA}); агрегировано ${groups.size} SKU/месяц`;
+  }catch(err){
+    console.error('Supabase dashboard load',err);
+    if(badge)badge.innerHTML+=`<br><span style="color:#dc2626"><b>Ошибка чтения Supabase:</b> ${esc(err.message)}</span>`;
+  }
+}
+
+refreshArchive().catch(e=>console.warn('Archive refresh',e));
+loadSupabaseIntoDashboard().catch(e=>console.warn('Dashboard load',e));
 </script></body></html>
