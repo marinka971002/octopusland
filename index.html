@@ -32,8 +32,8 @@
 <section id="ozon"><h2>Ozon — реализация, комиссия, доставка и возвраты</h2><div class="note">Здесь используются строки отчёта «Суммы услуг и расходы на реализацию»: артикул, реализовано, вознаграждение Ozon, обработка/доставка и расходы возвратов. Это не цена из orders.csv.</div><div class="scroll"><table id="oTable"></table></div></section>
 <section id="current"><h2>Текущий период — Ozon + Яндекс</h2><div class="note">Оперативный срез текущего незакрытого периода. Ozon и Яндекс показываются рядом; закрытые финансовые отчёты не подменяются оперативными заказами.</div><div id="currentKpi" class="grid"></div><div class="scroll"><table id="currentTable"></table></div></section><section id="stocks"><h2>Остатки и прогноз поставок</h2><div class="note">Прогноз Ozon считается по фактическим заказам за последние 28 дней в соответствующем кластере. Целевой запас можно менять. Для Яндекс прогноз появится после загрузки отчёта остатков.</div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0"><button class="stock-filter active" data-stock-platform="all">Все площадки</button><button class="stock-filter" data-stock-platform="ozon">Ozon</button><button class="stock-filter" data-stock-platform="yandex">Яндекс</button><label style="margin-left:auto">Целевой запас, дней <input id="targetDays" type="number" min="7" max="120" value="28" style="width:76px;margin-left:8px"></label></div><div id="supplyKpi" class="grid"></div><h3>Что нужно поставить</h3><div class="scroll"><table id="supplyTable"></table></div><h3 style="margin-top:22px">Все остатки</h3><div class="scroll"><table id="stockTable"></table></div><div id="yandexStockEmpty" class="note" style="margin-top:14px"><b>Яндекс Маркет:</b> отчёт остатков пока не загружен. Добавьте его во вкладке «Загрузка данных» — после этого Яндекс включится в общий прогноз поставок.</div></section>
 <section id="funnel"><h2>Яндекс — воронка продаж</h2><div class="scroll"><table id="funnelTable"></table></div><h2>Business Boost</h2><div class="scroll"><table id="boostTable"></table></div></section>
-<section id="bank"><h2>Все банковские операции III квартала</h2><div class="grid"><div class="card"><div class="k">Поступило</div><div class="v">454,823 ₽</div></div><div class="card"><div class="k">Списано</div><div class="v">503,598 ₽</div></div></div><h2>Операции и твоя расшифровка</h2><div class="scroll"><table id="bankTable"></table></div></section>
-<section id="upload"><h2>Загрузка данных</h2><div class="card" style="margin-bottom:16px"><h3 style="margin-top:0">Что загружать каждый месяц</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 22px;line-height:1.55"><div><b>Ozon</b><br>□ Реализация<br>□ Начисления<br>□ Логистика<br>□ Заказы<br>□ Остатки<br>□ Продвижение / реклама — если используется</div><div><b>Яндекс Маркет</b><br>□ Заказы / статистика<br>□ Отчёт о платежах<br>□ Услуги маркетплейса<br>□ Business Boost: сводный + файлы заказов<br>□ Остатки</div><div><b>Бухгалтерия / банк</b><br>□ «Деньги за период» — один раз за закрываемый месяц</div></div><div class="note" style="margin-top:12px"><b>Себестоимость не загружаем ежемесячно.</b> Она хранится в справочнике и обновляется только при изменении закупочной цены, появлении нового SKU или исправлении данных.</div></div>
+<section id="bank"><h2>Деньги / собственные расходы</h2><div class="grid"><div class="card"><div class="k">Поступило по банку</div><div class="v" id="bankInTotal">—</div></div><div class="card"><div class="k">Списано по банку</div><div class="v" id="bankOutTotal">—</div></div><div class="card"><div class="k">Учитываем в чистой прибыли</div><div class="v" id="bankOwnExpenseTotal">—</div><div class="small">без переводов между своими счетами и без повторного учёта расходов маркетплейсов</div></div><div class="card"><div class="k">Чистая прибыль после собственных расходов*</div><div class="v" id="netAfterOwnExpenses">—</div></div></div><div class="note">* Рассчитывается только по SKU, для которых известна себестоимость. Банковские поступления показываются для сверки и не заменяют выручку маркетплейсов.</div><h2>Операции и расшифровка</h2><div class="scroll"><table id="bankTable"></table></div></section>
+<section id="upload"><h2>Загрузка данных</h2><div class="card" style="margin-bottom:16px"><h3 style="margin-top:0">Что загружать каждый месяц</h3><div id="monthlyChecklist" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 22px;line-height:1.55"><div><b>Ozon</b><br>□ Реализация<br>□ Начисления<br>□ Логистика<br>□ Заказы<br>□ Остатки<br>□ Продвижение / реклама — если используется</div><div><b>Яндекс Маркет</b><br>□ Заказы / статистика<br>□ Отчёт о платежах<br>□ Услуги маркетплейса<br>□ Business Boost: сводный + файлы заказов<br>□ Остатки</div><div><b>Бухгалтерия / банк</b><br>□ «Деньги за период» — один раз за закрываемый месяц</div></div><div class="note" style="margin-top:12px"><b>Себестоимость не загружаем ежемесячно.</b> Она хранится в справочнике и обновляется только при изменении закупочной цены, появлении нового SKU или исправлении данных.</div></div>
 <div class="note">Добавляй новые отчёты Ozon и Яндекс Маркета, себестоимость и банковские/операционные расходы. Можно выбрать сразу несколько CSV, XLS или XLSX. Известные форматы обрабатываются в браузере; неизвестные автоматически распознаются ИИ через защищённую Edge Function. API-ключ в сайт не передаётся.</div>
 <div class="row2">
   <div class="card"><div class="k">Новые отчёты</div><div class="small" style="margin:8px 0 14px">Ozon: заказы, финансовые отчёты, остатки. Яндекс: заказы/статистика, услуги, Business Boost. Также — себестоимость и банковские расходы.</div>
@@ -121,7 +121,14 @@ function renderFinance(){
  renderCurrent();renderBank();
 }
 function renderCurrent(){const showSep=activePeriod==='all'||activePeriod==='current'||activePeriod==='2026-09'||(activePeriod==='custom'&&periodMatchMonth('2026-09'));const ozCur=showSep&&platformMatch('Ozon')?D.ozon_orders.filter(r=>String(r['Принят в обработку']||'').startsWith('2026-09')):[];const yaCur=showSep&&platformMatch('Яндекс')?D.unit.filter(r=>r.platform==='Яндекс'&&r.month==='2026-09*'):[];const ozQty=ozCur.reduce((a,r)=>a+(+r['Количество']||0),0),ozAmt=ozCur.reduce((a,r)=>a+(+r['Сумма отправления']||0),0),yaQty=total(yaCur,'qty'),yaAmt=total(yaCur,'revenue'),yaFees=total(yaCur,'fees');document.getElementById('currentKpi').innerHTML=`<div class="card"><div class="k">Ozon · заказы</div><div class="v">${num(ozCur.length)}</div><div class="small">${num(ozQty)} шт. · ${rub(ozAmt)}</div></div><div class="card"><div class="k">Яндекс · текущий период</div><div class="v">${rub(yaAmt)}</div><div class="small">${num(yaQty)} шт. · услуги ${rub(yaFees)}</div></div><div class="card"><div class="k">Итого оперативно</div><div class="v">${rub(ozAmt+yaAmt)}</div></div>`;table('currentTable',['Площадка','Период','Заказы/строки','Продано, шт.','Оперативная сумма','Расходы МП','Комментарий'],[...(platformMatch('Ozon')?[`<tr><td>Ozon</td><td>сентябрь</td><td>${num(ozCur.length)}</td><td>${num(ozQty)}</td><td>${rub(ozAmt)}</td><td>—</td><td>Расходы после закрытия финансового отчёта</td></tr>`]:[]),...(platformMatch('Яндекс')?[`<tr><td>Яндекс</td><td>01–20.09</td><td>${num(yaCur.length)}</td><td>${num(yaQty)}</td><td>${rub(yaAmt)}</td><td>${rub(yaFees)}</td><td>Есть услуги по заказам</td></tr>`]:[])])}
-function renderBank(){let rows=D.bank;if(activePeriod!=='all'){rows=rows.filter(r=>{const d=String(r.date||'');if(activePeriod==='custom'){const a=document.getElementById('dateFrom').value,b=document.getElementById('dateTo').value;return (!a||d>=a)&&(!b||d<=b)}const m=activePeriod==='current'?'2026-09':activePeriod;return d.startsWith(m)})}table('bankTable',['Дата','Контрагент','Поступило','Списано','Тип','Расшифровка'],rows.map(r=>`<tr><td>${r.date}</td><td>${esc(r.counterparty)}</td><td class="good">${r.in?rub(r.in):''}</td><td class="bad">${r.out?rub(r.out):''}</td><td>${esc(r.type)}</td><td>${esc(r.desc)}</td></tr>`));document.getElementById('bankKpi').textContent=rub(rows.reduce((a,r)=>a+(+r.in||0),0))+' / '+rub(rows.reduce((a,r)=>a+(+r.out||0),0))}
+function renderBank(){
+ let rows=(D.bank||[]).slice();
+ if(activePeriod!=='all'){rows=rows.filter(r=>{const d=String(r.date||'');if(activePeriod==='custom'){const a=document.getElementById('dateFrom').value,b=document.getElementById('dateTo').value;return (!a||d>=a)&&(!b||d<=b)}const m=activePeriod==='current'?'2026-09':activePeriod;return d.startsWith(m)})}
+ const bin=rows.reduce((a,r)=>a+(+r.in||0),0),bout=rows.reduce((a,r)=>a+(+r.out||0),0),own=rows.reduce((a,r)=>a+(r.exclude?0:(+r.out||0)),0);
+ table('bankTable',['Дата','Контрагент','Поступило','Списано','Тип','Расшифровка'],rows.map(r=>`<tr><td>${r.date||'—'}</td><td>${esc(r.counterparty||'')}</td><td class="good">${r.in?rub(r.in):''}</td><td class="bad">${r.out?rub(r.out):''}</td><td>${esc(r.exclude?'Не учитываем повторно':(r.type||'Расход'))}</td><td>${esc(r.desc||'')}</td></tr>`));
+ const e1=document.getElementById('bankInTotal'),e2=document.getElementById('bankOutTotal'),e3=document.getElementById('bankOwnExpenseTotal'),e4=document.getElementById('netAfterOwnExpenses');if(e1)e1.textContent=rub(bin);if(e2)e2.textContent=rub(bout);if(e3)e3.textContent=rub(own);
+ const known=filterUnits().filter(r=>r.profit!=null),profit=total(known,'profit');if(e4)e4.textContent=rub(profit-own);document.getElementById('bankKpi').textContent=rub(bin)+' / '+rub(bout)
+}
 function applyFilters(){activePeriod=pf.value;activePlatform=plf.value;localStorage.setItem('octopusland_period_v2',activePeriod);localStorage.setItem('octopusland_platform_v2',activePlatform);document.getElementById('customDates').classList.toggle('show',activePeriod==='custom');renderFinance()}
 pf.addEventListener('change',applyFilters);plf.addEventListener('change',applyFilters);document.getElementById('dateFrom').addEventListener('change',applyFilters);document.getElementById('dateTo').addEventListener('change',applyFilters);document.getElementById('customDates').classList.toggle('show',activePeriod==='custom');
 renderFinance();
@@ -241,13 +248,39 @@ function parseAIWorkbookRows(fileName,sheetName,rows,ai){
   }
   return {rows:out,period:textPeriod,ai};
 }
+
+function pickByKey(obj,needles){
+  const keys=Object.keys(obj||{});for(const n of needles){const k=keys.find(x=>String(x).toLowerCase().replace(/ё/g,'е').includes(n));if(k)return obj[k]}return null;
+}
+function parseBankRowsFromGrid(rows,ai){
+  const hi=resolveAIHeaderRow(rows,ai||{mapping:{},header_row:findHeaderRow(rows)}),objs=rowsToObjects(rows,hi),out=[];
+  const period=extractPeriod((rows||[]).slice(0,15).flat().join(' '));
+  for(const r of objs){
+    const d=anyDate(mappedValue(r,ai?.mapping,'expense_date'))||anyDate(mappedValue(r,ai?.mapping,'operation_date'))||anyDate(pickByKey(r,['дата операции','дата','проведен']));
+    const incoming=Math.abs(cleanNum(pickByKey(r,['поступило','приход','зачислено']))||0);
+    const outgoing=Math.abs(cleanNum(pickByKey(r,['списано','расход','оплачено']))||0);
+    let amount=cleanNum(mappedValue(r,ai?.mapping,'other_expenses'));
+    if(amount==null)amount=cleanNum(pickByKey(r,['сумма операции','сумма','amount']));
+    let expense=outgoing;
+    if(!expense&&amount!=null&&amount<0)expense=Math.abs(amount);
+    const desc=String(pickByKey(r,['назначение платежа','назначение','описание','комментарий'])||'').trim();
+    const counterparty=String(pickByKey(r,['контрагент','получатель','плательщик','наименование'])||'').trim();
+    const text=(desc+' '+counterparty).toLowerCase().replace(/ё/g,'е');
+    const selfTransfer=/между\s+(своими|собственными)|перевод.*счет|собственн.*средств/.test(text);
+    const marketplaceDuplicate=/(^|\s)(ozon|озон|яндекс маркет|yandex market)(\s|$)/.test(text);
+    const excluded=selfTransfer||marketplaceDuplicate;
+    if(!d&&!incoming&&!expense&&!desc&&!counterparty)continue;
+    out.push({marketplace:'Банк',report_type:'Банк / расходы',operation_date:d||period.to,month:monthStart(d||period.to),sku:null,offer_id:null,product_name:null,order_id:null,quantity:0,revenue:0,commission:0,logistics:0,storage:0,advertising:0,returns:0,other_expenses:excluded?0:expense,payout:incoming-expense,raw_data:{bank:true,incoming,outgoing:expense,description:desc,counterparty,excluded_from_profit:excluded,exclude_reason:selfTransfer?'Перевод между своими счетами':marketplaceDuplicate?'Расход маркетплейса учитывается по отчёту площадки':'',source_row:r}});
+  }
+  return {rows:out,period,ai};
+}
 async function parseWithAI(f,buf){
   if(typeof XLSX==='undefined')throw new Error('Модуль Excel XLSX не загрузился');
-  if(f.name.toLowerCase().endsWith('.csv')){const rows=csvParse(new TextDecoder().decode(buf));const ai=await callAIReportParser(f.name,'CSV',rows);return {meta:{name:f.name,type:aiTypeLabel(ai.marketplace,ai.report_type),sheet:'CSV',headerRow:ai.header_row,headers:rows[ai.header_row]||[],ai},parsed:parseAIWorkbookRows(f.name,'CSV',rows,ai)}}
+  if(f.name.toLowerCase().endsWith('.csv')){const rows=csvParse(new TextDecoder().decode(buf));const ai=await callAIReportParser(f.name,'CSV',rows);return {meta:{name:f.name,type:aiTypeLabel(ai.marketplace,ai.report_type),sheet:'CSV',headerRow:ai.header_row,headers:rows[ai.header_row]||[],ai},parsed:(['bank','accounting'].includes(String(ai.marketplace||'').toLowerCase())?parseBankRowsFromGrid(rows,ai):parseAIWorkbookRows(f.name,'CSV',rows,ai))}}
   const w=XLSX.read(buf,{type:'array'});let best=null;
   for(const sn of w.SheetNames){const rows=XLSX.utils.sheet_to_json(w.Sheets[sn],{header:1,defval:'',raw:false,blankrows:true});if(!rows.length)continue;const ai=await callAIReportParser(f.name,sn,rows);if(!best||Number(ai.confidence||0)>Number(best.ai.confidence||0))best={sn,rows,ai};if(Number(ai.confidence||0)>=.8)break}
   if(!best)throw new Error('ИИ не смог прочитать листы файла');
-  return {meta:{name:f.name,type:aiTypeLabel(best.ai.marketplace,best.ai.report_type),sheet:best.sn,headerRow:best.ai.header_row,headers:best.rows[best.ai.header_row]||[],ai:best.ai},parsed:parseAIWorkbookRows(f.name,best.sn,best.rows,best.ai)};
+  return {meta:{name:f.name,type:aiTypeLabel(best.ai.marketplace,best.ai.report_type),sheet:best.sn,headerRow:best.ai.header_row,headers:best.rows[best.ai.header_row]||[],ai:best.ai},parsed:(['bank','accounting'].includes(String(best.ai.marketplace||'').toLowerCase())?parseBankRowsFromGrid(best.rows,best.ai):parseAIWorkbookRows(f.name,best.sn,best.rows,best.ai))};
 }
 async function sbRequest(path,options={}){
   const controller=new AbortController();
@@ -446,10 +479,10 @@ async function saveIncomingFile(f,onStage=()=>{}){
   }
 
   const isOwnExpense=meta.type==='Банк / расходы';
-  const row={file_name:f.name,file_hash:hash,marketplace:marketFromType(meta.type),report_type:meta.type,period_from:parsed.period.from,period_to:parsed.period.to,status:isOwnExpense?'recognized_needs_expense_import':'recognized',recognition_method:usedAI?'ai':'rules',recognition_confidence:usedAI?Number(meta.ai?.confidence||0):0.95};
+  const row={file_name:f.name,file_hash:hash,marketplace:marketFromType(meta.type),report_type:meta.type,period_from:parsed.period.from,period_to:parsed.period.to,status:'recognized',recognition_method:usedAI?'ai':'rules',recognition_confidence:usedAI?Number(meta.ai?.confidence||0):0.95};
   onStage('Сохраняю в базу…');
   const data=await sbRequest('uploads',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)}),saved=Array.isArray(data)?data[0]:data;
-  const parsedRows=isOwnExpense?0:await insertParsedRows(saved.id,parsed);
+  const parsedRows=await insertParsedRows(saved.id,parsed);
   await putLocal({id:hash,name:f.name,type:meta.type,rows:meta.rows,headers:meta.headers,size:buf.byteLength,addedAt:new Date().toISOString(),uploadId:saved?.id});
   return {duplicate:false,meta,data:saved,parsedRows,period:parsed.period,usedAI,isOwnExpense};
 }
@@ -477,8 +510,9 @@ const fu=document.getElementById('fileUpload');if(fu)fu.addEventListener('change
     }
   }
   await refreshArchive();
+  await renderMonthlyChecklist();
   await loadSupabaseIntoDashboard().catch(err=>console.warn('Dashboard reload after upload',err));
-  let html=`<b>Готово:</b> новых файлов ${added}, уже были в базе ${dups}${alreadyRows?' (в них уже сохранено строк: '+alreadyRows+')':''}${repaired?', восстановлено ранее пустых отчётов '+repaired:''}, новых строк записано <b>${parsedRows}</b>${aiUsed?', ИИ распознал '+aiUsed:''}${ownExpenses?', бухгалтерских/банковских отчётов '+ownExpenses+' (распознаны, импорт расходов подключим отдельно)':''}${unknown?', не распознано '+unknown:''}${errors.length?', ошибок '+errors.length:''}.`;
+  let html=`<b>Готово:</b> новых файлов ${added}, уже были в базе ${dups}${alreadyRows?' (в них уже сохранено строк: '+alreadyRows+')':''}${repaired?', восстановлено ранее пустых отчётов '+repaired:''}, новых строк записано <b>${parsedRows}</b>${aiUsed?', ИИ распознал '+aiUsed:''}${ownExpenses?', бухгалтерских/банковских отчётов '+ownExpenses+' (расходы импортированы)':''}${unknown?', не распознано '+unknown:''}${errors.length?', ошибок '+errors.length:''}.`;
   if(errors.length){
     html+=`<div style="margin-top:10px;padding:10px;border:1px solid #7f1d1d;background:#2b1116;border-radius:9px;color:#fecaca"><b>Почему не загрузилось:</b>`+errors.map(x=>`<div style="margin-top:7px"><b>${esc(x.name)}</b><br><span style="user-select:text">${esc(x.message)}</span></div>`).join('')+`</div>`;
   }
@@ -491,58 +525,38 @@ const clr=document.getElementById('clearAdded');if(clr){clr.textContent='Обл�
 
 // === Supabase -> dashboard ===
 // Загруженные финансовые строки становятся частью юнит-экономики, а не только архива.
+async function renderMonthlyChecklist(){
+  const el=document.getElementById('monthlyChecklist');if(!el)return;
+  let a=[];try{a=await cloudReports()}catch{}
+  const types=a.map(x=>String(x.report_type||'').toLowerCase());
+  const has=(...keys)=>types.some(t=>keys.some(k=>t.includes(k)));
+  const mark=(ok,label,optional=false)=>`${ok?'✓':'□'} ${label}${optional?' <span class="small">(если используется)</span>':''}`;
+  el.innerHTML=`<div><b>Ozon</b><br>${mark(has('реализац'),'Реализация')}<br>${mark(has('ozon · начислен'),'Начисления')}<br>${mark(has('ozon · логист'),'Логистика')}<br>${mark(has('ozon · заказ'),'Заказы')}<br>${mark(has('ozon · остат'),'Остатки')}<br>${mark(has('реклам','продвиж'),'Продвижение / реклама',true)}</div><div><b>Яндекс Маркет</b><br>${mark(has('яндекс · заказы','заказы/статистика'),'Заказы / статистика')}<br>${mark(has('отчёт о платеж','отчет о платеж'),'Отчёт о платежах')}<br>${mark(has('яндекс · услуги','marketplace services'),'Услуги маркетплейса')}<br>${mark(has('business boost'),'Business Boost',true)}<br>${mark(has('яндекс · остат'),'Остатки')}</div><div><b>Бухгалтерия / банк</b><br>${mark(has('банк / расходы'),'«Деньги за период»')}</div>`;
+}
+function rebuildSummaryFromUnits(){
+ const m=new Map();for(const r of D.unit){const k=r.platform+'|'+normMonth(r.month);if(!m.has(k))m.set(k,{platform:r.platform,month:normMonth(r.month),revenue:0,qty:0,fees:0,tax:0,profit_known:0,known_rev:0});const g=m.get(k);g.revenue+=+r.revenue||0;g.qty+=+r.qty||0;g.fees+=+r.fees||0;g.tax+=+r.tax||0;if(r.profit!=null){g.profit_known+=+r.profit||0;g.known_rev+=+r.revenue||0}}
+ D.summary=[...m.values()].map(g=>({...g,coverage:g.revenue?g.known_rev/g.revenue*100:0}));
+}
 async function loadSupabaseIntoDashboard(){
   const badge=document.getElementById('dbSummary');
   try{
-    const allRows=await sbRequest('marketplace_data?select=marketplace,report_type,operation_date,month,sku,offer_id,product_name,quantity,revenue,commission,logistics,storage,advertising,returns,other_expenses,payout&marketplace=eq.Ozon&order=operation_date.asc&limit=10000');
-    const oz=Array.isArray(allRows)?allRows:[];
-    const realization=oz.filter(r=>String(r.report_type||'').toLowerCase().includes('реализац'));
-    const accruals=oz.filter(r=>String(r.report_type||'').toLowerCase().includes('начислен'));
-    if(!realization.length){
-      if(badge)badge.innerHTML+=`<br><span style="color:#b45309">Supabase: строк реализации Ozon пока нет (${oz.length} строк Ozon всего)</span>`;
-      return;
-    }
-    const groups=new Map();
-    const getGroup=(r)=>{
-      let month=String(r.month||'').slice(0,7); if(!/^20\d\d-\d\d$/.test(month))month=String(r.operation_date||'').slice(0,7);
-      const sellerSku=String(r.offer_id||r.sku||'').trim(); if(!/^20\d\d-\d\d$/.test(month)||!sellerSku)return null;
-      const k=['Ozon',month,sellerSku].join('|');
-      if(!groups.has(k))groups.set(k,{platform:'Ozon',month,sku:sellerSku,name:r.product_name||'',qty:0,revenue:0,fees:0,tax:0,cost_unit:null,cogs:null,profit:null,margin:null,roi:null,commission:0,logistics:0,returns:0,fee_cats:{},_supabase:true});
-      return groups.get(k);
-    };
-    for(const r of realization){
-      const g=getGroup(r); if(!g)continue;
-      g.qty+=Number(r.quantity)||0; g.revenue+=Number(r.revenue)||0;
-      if(!g.name&&r.product_name)g.name=r.product_name;
-    }
-    for(const r of accruals){
-      const g=getGroup(r); if(!g)continue; // расходы без SKU сохраняются в базе, но не размазываются по товарам автоматически
-      const c=Number(r.commission)||0,l=Number(r.logistics)||0,st=Number(r.storage)||0,ad=Number(r.advertising)||0,ret=Number(r.returns)||0,o=Number(r.other_expenses)||0;
-      g.commission+=c;g.logistics+=l;g.returns+=ret;g.fees+=c+l+st+ad+ret+o;
-      g.fee_cats['Комиссия']=(g.fee_cats['Комиссия']||0)+c;
-      g.fee_cats['Логистика']=(g.fee_cats['Логистика']||0)+l;
-      g.fee_cats['Хранение']=(g.fee_cats['Хранение']||0)+st;
-      g.fee_cats['Реклама']=(g.fee_cats['Реклама']||0)+ad;
-      g.fee_cats['Возвраты']=(g.fee_cats['Возвраты']||0)+ret;
-      g.fee_cats['Прочее']=(g.fee_cats['Прочее']||0)+o;
-    }
-    const original=D.unit.filter(x=>!x._supabase); D.unit=original.slice();
-    for(const g of groups.values()){
-      const costRef=original.find(x=>x.sku===g.sku&&x.cost_unit!=null); if(costRef)g.cost_unit=Number(costRef.cost_unit);
-      g.tax=g.revenue*0.06;
-      if(g.cost_unit!=null){g.cogs=g.cost_unit*g.qty;g.profit=g.revenue-g.fees-g.tax-g.cogs;g.margin=g.revenue?g.profit/g.revenue*100:null;g.roi=g.cogs?g.profit/g.cogs*100:null;}
-      D.unit=D.unit.filter(x=>!(x.platform==='Ozon'&&normMonth(x.month)===g.month&&x.sku===g.sku)); D.unit.push(g);
-    }
-    renderFinance();
-    const septR=realization.filter(r=>String(r.month||r.operation_date||'').startsWith('2026-09')).length;
-    const septA=accruals.filter(r=>String(r.month||r.operation_date||'').startsWith('2026-09')).length;
-    if(badge)badge.innerHTML+=`<br><b>Supabase → дашборд:</b> реализация ${realization.length} строк (сентябрь ${septR}); начисления ${accruals.length} (сентябрь ${septA}); агрегировано ${groups.size} SKU/месяц`;
-  }catch(err){
-    console.error('Supabase dashboard load',err);
-    if(badge)badge.innerHTML+=`<br><span style="color:#dc2626"><b>Ошибка чтения Supabase:</b> ${esc(err.message)}</span>`;
-  }
+    const all=await sbRequest('marketplace_data?select=marketplace,report_type,operation_date,month,sku,offer_id,product_name,quantity,revenue,commission,logistics,storage,advertising,returns,other_expenses,payout,raw_data&order=operation_date.asc&limit=10000');
+    const rows=Array.isArray(all)?all:[],original=D.unit.filter(x=>!x._supabase),costBySku=new Map();
+    for(const x of original)if(x.cost_unit!=null&&!costBySku.has(x.sku))costBySku.set(x.sku,+x.cost_unit);
+    const groups=new Map(), get=(platform,month,sku,name)=>{if(!month||!sku)return null;const k=[platform,month,sku].join('|');if(!groups.has(k))groups.set(k,{platform,month,sku,name:name||'',qty:0,revenue:0,fees:0,tax:0,cost_unit:costBySku.get(sku)??null,cogs:null,profit:null,margin:null,roi:null,commission:0,logistics:0,returns:0,fee_cats:{},_supabase:true});return groups.get(k)};
+    const oz=rows.filter(r=>r.marketplace==='Ozon'),ya=rows.filter(r=>r.marketplace==='Яндекс'),bank=rows.filter(r=>r.marketplace==='Банк'||String(r.report_type||'').toLowerCase().includes('банк / расходы'));
+    for(const r of oz){const t=String(r.report_type||'').toLowerCase(),m=String(r.month||r.operation_date||'').slice(0,7),sku=String(r.offer_id||r.sku||'').trim();const g=get('Ozon',m,sku,r.product_name);if(!g)continue;if(t.includes('реализац')){g.qty+=+r.quantity||0;g.revenue+=+r.revenue||0}if(t.includes('начислен')){const c=+r.commission||0,l=+r.logistics||0,st=+r.storage||0,ad=+r.advertising||0,ret=+r.returns||0,o=+r.other_expenses||0;g.commission+=c;g.logistics+=l;g.returns+=ret;g.fees+=c+l+st+ad+ret+o}}
+    const yaOrders=new Set(ya.filter(r=>String(r.report_type||'').toLowerCase().includes('заказы')).map(r=>String(r.month||r.operation_date||'').slice(0,7)+'|'+String(r.sku||r.offer_id||'').trim()));
+    const yaServices=ya.filter(r=>String(r.report_type||'').toLowerCase().includes('услуг'));
+    const yaServiceKeys=new Set(yaServices.map(r=>String(r.month||r.operation_date||'').slice(0,7)+'|'+String(r.sku||r.offer_id||'').trim()));
+    for(const r of ya){const t=String(r.report_type||'').toLowerCase(),m=String(r.month||r.operation_date||'').slice(0,7),sku=String(r.sku||r.offer_id||'').trim(),key=m+'|'+sku,g=get('Яндекс',m,sku,r.product_name);if(!g)continue;if(t.includes('заказы')){g.qty+=+r.quantity||0;g.revenue+=+r.revenue||0}else if(t.includes('платеж')&&!yaOrders.has(key)){g.qty+=+r.quantity||0;g.revenue+=+r.revenue||0}const useFees=t.includes('услуг')||(t.includes('платеж')&&!yaServiceKeys.has(key));if(useFees){const c=+r.commission||0,l=+r.logistics||0,st=+r.storage||0,ad=+r.advertising||0,ret=+r.returns||0,o=+r.other_expenses||0;g.commission+=c;g.logistics+=l;g.returns+=ret;g.fees+=c+l+st+ad+ret+o}}
+    D.unit=original.slice();for(const g of groups.values()){g.tax=g.revenue*.06;if(g.cost_unit!=null){g.cogs=g.cost_unit*g.qty;g.profit=g.revenue-g.fees-g.tax-g.cogs;g.margin=g.revenue?g.profit/g.revenue*100:null;g.roi=g.cogs?g.profit/g.cogs*100:null}D.unit=D.unit.filter(x=>!(x.platform===g.platform&&normMonth(x.month)===g.month&&x.sku===g.sku));D.unit.push(g)}
+    if(bank.length){D.bank=bank.map(r=>{const raw=r.raw_data||{};return {date:r.operation_date,counterparty:raw.counterparty||'',in:+raw.incoming||0,out:+raw.outgoing||(+r.other_expenses||0),type:raw.exclude_reason||'Операционный расход',desc:raw.description||'',exclude:!!raw.excluded_from_profit}})}
+    rebuildSummaryFromUnits();renderFinance();await renderMonthlyChecklist();
+    if(badge)badge.innerHTML+=`<br><b>Supabase → дашборд:</b> Ozon ${oz.length} строк · Яндекс ${ya.length} · банк ${bank.length} · финансовых SKU/месяц ${groups.size}`;
+  }catch(err){console.error('Supabase dashboard load',err);if(badge)badge.innerHTML+=`<br><span style="color:#dc2626"><b>Ошибка чтения Supabase:</b> ${esc(err.message)}</span>`}
 }
 
-refreshArchive().catch(e=>console.warn('Archive refresh',e));
+refreshArchive().then(renderMonthlyChecklist).catch(e=>console.warn('Archive refresh',e));
 loadSupabaseIntoDashboard().catch(e=>console.warn('Dashboard load',e));
 </script></body></html>
