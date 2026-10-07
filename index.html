@@ -167,7 +167,7 @@ document.getElementById('qualityBox').innerHTML=q;
 
 
 function csvParse(text){const rows=[];let row=[],cell='',q=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'){if(q&&n==='"'){cell+='"';i++;}else q=!q;}else if(c===','&&!q){row.push(cell);cell='';}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&n==='\n')i++;row.push(cell);cell='';if(row.some(x=>x!==''))rows.push(row);row=[];}else cell+=c;}if(cell||row.length){row.push(cell);rows.push(row)}return rows}
-function detectUpload(name,headers,sheetName=''){const n=name.toLowerCase().replace(/ё/g,'е'),h=headers.join(' ').toLowerCase().replace(/ё/g,'е'),sn=sheetName.toLowerCase().replace(/ё/g,'е'); if((n.includes('начислен')||sn.includes('начислен'))&&n.includes('отчет'))return 'Ozon · начисления'; if((n.includes('логистик')||sn.includes('логистик'))&&n.includes('отчет'))return 'Ozon · логистика';
+function detectUpload(name,headers,sheetName=''){const n=name.toLowerCase().replace(/ё/g,'е'),h=headers.join(' ').toLowerCase().replace(/ё/g,'е'),sn=sheetName.toLowerCase().replace(/ё/g,'е'); if(n.includes('деньги_за_период')||n.includes('деньги за период'))return 'Банк / расходы'; if((n.includes('начислен')||sn.includes('начислен'))&&n.includes('отчет'))return 'Ozon · начисления'; if((n.includes('логистик')||sn.includes('логистик'))&&n.includes('отчет'))return 'Ozon · логистика';
 if(h.includes('номер заказа')&&h.includes('артикул')&&h.includes('кластер'))return 'Ozon · заказы';
 if(h.includes('ваш sku')&&(h.includes('остаток')||h.includes('доступно')||h.includes('на складе')))return 'Яндекс · остатки';
 if(h.includes('ваш sku')&&(h.includes('стоимость услуги')||h.includes('название услуги')))return 'Яндекс · услуги';
@@ -320,7 +320,46 @@ function extractPeriod(text){const m=String(text||'').match(/(?:с\s*)?(\d{2}\.\
 async function parseMarketplaceFile(f,buf,meta){
   if(typeof XLSX==='undefined')throw new Error('Модуль Excel XLSX не загрузился. Проверь интернет и обнови страницу, затем выбери файл ещё раз.');
   const w=XLSX.read(buf,{type:'array'}), out=[]; let period={from:null,to:null};
-  if(meta.type==='Яндекс · отчёт о платежах'){
+  if(meta.type==='Банк / расходы'){
+    // 1С/банк: ищем реальную строку шапки по финансовым полям, а не полагаемся на общий эвристический заголовок.
+    let best=null;
+    for(const sn of w.SheetNames){
+      const rows=XLSX.utils.sheet_to_json(w.Sheets[sn],{header:1,defval:'',raw:false,blankrows:true});
+      for(let i=0;i<Math.min(rows.length,120);i++){
+        const h=(rows[i]||[]).map(v=>String(v??'').toLowerCase().replace(/ё/g,'е').trim()).join(' | ');
+        let score=0; ['дата','поступ','спис','сумм','назнач','контраг','получател','плательщик','операц'].forEach(k=>{if(h.includes(k))score++});
+        if(!best||score>best.score)best={sn,rows,hi:i,score};
+      }
+    }
+    if(!best||best.score<2)throw new Error('В отчёте «Деньги за период» не найдена таблица операций');
+    const parsed=parseBankRowsFromGrid(best.rows,{mapping:{},header_row:best.hi});
+    if(!parsed.rows.length)throw new Error('Таблица операций найдена, но поступления/списания не прочитались');
+    return parsed;
+  } else if(meta.type==='Яндекс · Business Boost'){
+    // Известный формат Яндекса разбираем локально: ИИ для него не нужен.
+    let best=null;
+    for(const sn of w.SheetNames){
+      const rows=XLSX.utils.sheet_to_json(w.Sheets[sn],{header:1,defval:'',raw:false,blankrows:true});
+      const hi=findHeaderRow(rows), headers=(rows[hi]||[]).map(v=>String(v??'').trim());
+      const text=headers.join(' ').toLowerCase().replace(/ё/g,'е');
+      const score=(text.includes('буст')?4:0)+(text.includes('sku')?3:0)+(text.includes('расход')?3:0)+(text.includes('заказ')?2:0)+(text.includes('выруч')?2:0);
+      if(!best||score>best.score)best={sn,rows,hi,score};
+    }
+    if(!best)throw new Error('Business Boost: лист с данными не найден');
+    const objs=rowsToObjects(best.rows,best.hi); period=extractPeriod(best.rows.slice(0,20).flat().join(' '));
+    for(const r of objs){
+      const d=anyDate(pickByKey(r,['дата','день']))||period.to;
+      const sku=String(pickByKey(r,['ваш sku','sku','артикул'])||'').trim()||null;
+      const name=String(pickByKey(r,['название товара','товар'])||'').trim()||null;
+      const spend=Math.abs(cleanNum(pickByKey(r,['расходы на буст','расход на буст','расходы','стоимость']))||0);
+      const revenue=Math.abs(cleanNum(pickByKey(r,['выручка с бустом','выручка','сумма заказа']))||0);
+      const qty=cleanNum(pickByKey(r,['доставленные товары','заказанные товары','количество']))||0;
+      const orderId=String(pickByKey(r,['номер заказа','заказ'])||'').trim()||null;
+      if(!d&&!sku&&!name&&!spend&&!revenue&&!qty&&!orderId)continue;
+      out.push({marketplace:'Яндекс',report_type:'Яндекс · Business Boost',operation_date:d,month:monthStart(d),sku,offer_id:sku,product_name:name,order_id:orderId,quantity:qty,revenue:0,commission:0,logistics:0,storage:0,advertising:spend,returns:0,other_expenses:0,payout:null,raw_data:{boost:true,boost_revenue:revenue,source_row:r}});
+    }
+    if(!out.length)throw new Error('Business Boost распознан, но строки не извлечены');
+  } else if(meta.type==='Яндекс · отчёт о платежах'){
     const sumName=w.SheetNames.find(n=>n.toLowerCase().includes('свод'));
     if(sumName){const sr=XLSX.utils.sheet_to_json(w.Sheets[sumName],{header:1,defval:'',raw:false});period=extractPeriod((sr.flat().find(x=>String(x).includes('Отчёт о платежах за период'))||''));}
     const sn=w.SheetNames.find(n=>n.toLowerCase().includes('платеж'))||meta.sheet;
