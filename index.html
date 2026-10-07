@@ -34,7 +34,7 @@
 <section id="funnel"><h2>Яндекс — воронка продаж</h2><div class="scroll"><table id="funnelTable"></table></div><h2>Business Boost</h2><div class="scroll"><table id="boostTable"></table></div></section>
 <section id="bank"><h2>Все банковские операции III квартала</h2><div class="grid"><div class="card"><div class="k">Поступило</div><div class="v">454,823 ₽</div></div><div class="card"><div class="k">Списано</div><div class="v">503,598 ₽</div></div></div><h2>Операции и твоя расшифровка</h2><div class="scroll"><table id="bankTable"></table></div></section>
 <section id="upload"><h2>Загрузка данных</h2>
-<div class="note">Добавляй новые отчёты Ozon и Яндекс Маркета, себестоимость и банковские/операционные расходы. Можно выбрать сразу несколько CSV, XLS или XLSX. Файлы обрабатываются в браузере.</div>
+<div class="note">Добавляй новые отчёты Ozon и Яндекс Маркета, себестоимость и банковские/операционные расходы. Можно выбрать сразу несколько CSV, XLS или XLSX. Известные форматы обрабатываются в браузере; неизвестные автоматически распознаются ИИ через защищённую Edge Function. API-ключ в сайт не передаётся.</div>
 <div class="row2">
   <div class="card"><div class="k">Новые отчёты</div><div class="small" style="margin:8px 0 14px">Ozon: заказы, финансовые отчёты, остатки. Яндекс: заказы/статистика, услуги, Business Boost. Также — себестоимость и банковские расходы.</div>
     <label for="fileUpload" style="display:inline-block;padding:11px 16px;border-radius:10px;background:#2563eb;color:white;font-weight:700;cursor:pointer">Выбрать файлы</label>
@@ -186,6 +186,53 @@ const SB_HEADERS={
   'Authorization':'Bearer '+SUPABASE_KEY,
   'Content-Type':'application/json'
 };
+const AI_PARSER_URL=SUPABASE_URL+'/functions/v1/ai-report-parser';
+function aiTypeLabel(marketplace,reportType){
+  const m=String(marketplace||'').toLowerCase(),t=String(reportType||'').toLowerCase();
+  if(m==='ozon')return t==='accruals'?'Ozon · начисления':t==='logistics'?'Ozon · логистика':t==='realization'?'Ozon · финансы/реализация':t==='stocks'?'Ozon · остатки':'Ozon · '+(reportType||'ИИ-отчёт');
+  if(m==='yandex')return t==='stocks'?'Яндекс · остатки':t==='services'?'Яндекс · услуги':t==='boost'?'Яндекс · Business Boost':t==='orders'?'Яндекс · заказы/статистика':'Яндекс · '+(reportType||'ИИ-отчёт');
+  if(m==='bank'||m==='accounting')return 'Банк / расходы';
+  if(m==='octopusland'||t==='product_costs')return 'Себестоимость';
+  return 'Не определён автоматически';
+}
+function aiCacheKey(fileName,sheetName,rows){
+  const sample=(rows||[]).slice(0,8).map(r=>(r||[]).map(v=>String(v??'').trim().toLowerCase()));
+  return 'octopusland_ai_map_v1:'+btoa(unescape(encodeURIComponent(JSON.stringify([sheetName,sample])))).slice(0,180);
+}
+async function callAIReportParser(fileName,sheetName,rows){
+  const key=aiCacheKey(fileName,sheetName,rows);
+  try{const cached=localStorage.getItem(key);if(cached)return {...JSON.parse(cached),_cached:true}}catch{}
+  const r=await fetch(AI_PARSER_URL,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({file_name:fileName,sheet_name:sheetName,rows:(rows||[]).slice(0,40)})});
+  const body=await r.json().catch(()=>null);
+  if(!r.ok||!body?.ok)throw new Error(body?.error||('ИИ-распознавание: HTTP '+r.status));
+  const result=body.result||{};
+  if(!result.mapping||typeof result.header_row!=='number')throw new Error('ИИ не вернул корректную карту колонок');
+  try{localStorage.setItem(key,JSON.stringify(result))}catch{}
+  return result;
+}
+function mappedValue(obj,mapping,key){const h=mapping?.[key];return h!=null&&h!==''?obj[h]:null}
+function parseAIWorkbookRows(fileName,sheetName,rows,ai){
+  const hi=Math.max(0,Number(ai.header_row)||0),objs=rowsToObjects(rows,hi),mp=String(ai.marketplace||'').toLowerCase(),rt=String(ai.report_type||'').toLowerCase(),mapping=ai.mapping||{},out=[];
+  const textPeriod=extractPeriod((rows||[]).slice(0,12).flat().join(' '));
+  for(const r of objs){
+    const d=anyDate(mappedValue(r,mapping,'operation_date'))||anyDate(mappedValue(r,mapping,'expense_date'))||textPeriod.to;
+    const sku=String(mappedValue(r,mapping,'sku')??'').trim()||null,offer=String(mappedValue(r,mapping,'offer_id')??'').trim()||null,name=String(mappedValue(r,mapping,'product_name')??'').trim()||null;
+    const qty=cleanNum(mappedValue(r,mapping,'quantity'))||0,rev=cleanNum(mappedValue(r,mapping,'revenue'))||0;
+    const commission=Math.abs(cleanNum(mappedValue(r,mapping,'commission'))||0),logistics=Math.abs(cleanNum(mappedValue(r,mapping,'logistics'))||0),storage=Math.abs(cleanNum(mappedValue(r,mapping,'storage'))||0),advertising=Math.abs(cleanNum(mappedValue(r,mapping,'advertising'))||0),returns=Math.abs(cleanNum(mappedValue(r,mapping,'returns'))||0),acquiring=Math.abs(cleanNum(mappedValue(r,mapping,'acquiring'))||0),paymentFee=Math.abs(cleanNum(mappedValue(r,mapping,'payment_fee'))||0),other=Math.abs(cleanNum(mappedValue(r,mapping,'other_expenses'))||0),payout=cleanNum(mappedValue(r,mapping,'payout'));
+    if(mp==='bank'||mp==='accounting')continue; // собственные расходы пойдут в expenses отдельным безопасным обработчиком
+    if(!d&&!sku&&!offer&&!name&&!qty&&!rev&&!commission&&!logistics&&!storage&&!advertising&&!returns&&!acquiring&&!paymentFee&&!other&&payout==null)continue;
+    out.push({marketplace:mp==='ozon'?'Ozon':mp==='yandex'?'Яндекс':ai.marketplace||null,report_type:aiTypeLabel(ai.marketplace,ai.report_type),operation_date:d,month:monthStart(d),sku,offer_id:offer,product_name:name,order_id:null,quantity:qty,revenue:rev,commission,logistics,storage,advertising,returns,other_expenses:other+acquiring+paymentFee,payout,raw_data:{ai:true,confidence:ai.confidence,recognition_notes:ai.recognition_notes,source_row:r}});
+  }
+  return {rows:out,period:textPeriod,ai};
+}
+async function parseWithAI(f,buf){
+  if(typeof XLSX==='undefined')throw new Error('Модуль Excel XLSX не загрузился');
+  if(f.name.toLowerCase().endsWith('.csv')){const rows=csvParse(new TextDecoder().decode(buf));const ai=await callAIReportParser(f.name,'CSV',rows);return {meta:{name:f.name,type:aiTypeLabel(ai.marketplace,ai.report_type),sheet:'CSV',headerRow:ai.header_row,headers:rows[ai.header_row]||[],ai},parsed:parseAIWorkbookRows(f.name,'CSV',rows,ai)}}
+  const w=XLSX.read(buf,{type:'array'});let best=null;
+  for(const sn of w.SheetNames){const rows=XLSX.utils.sheet_to_json(w.Sheets[sn],{header:1,defval:'',raw:false,blankrows:true});if(!rows.length)continue;const ai=await callAIReportParser(f.name,sn,rows);if(!best||Number(ai.confidence||0)>Number(best.ai.confidence||0))best={sn,rows,ai};if(Number(ai.confidence||0)>=.8)break}
+  if(!best)throw new Error('ИИ не смог прочитать листы файла');
+  return {meta:{name:f.name,type:aiTypeLabel(best.ai.marketplace,best.ai.report_type),sheet:best.sn,headerRow:best.ai.header_row,headers:best.rows[best.ai.header_row]||[],ai:best.ai},parsed:parseAIWorkbookRows(f.name,best.sn,best.rows,best.ai)};
+}
 async function sbRequest(path,options={}){
   const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
     ...options,
@@ -345,12 +392,20 @@ async function insertParsedRows(uploadId,parsed,force=false){
   return count;
 }
 async function saveIncomingFile(f){
-  const buf=await f.arrayBuffer(),hash=await sha256(buf),fileObj=new File([buf],f.name,{type:f.type,lastModified:f.lastModified}),meta=await inspectFile(fileObj),parsed=await parseMarketplaceFile(fileObj,buf,meta);
+  const buf=await f.arrayBuffer(),hash=await sha256(buf),fileObj=new File([buf],f.name,{type:f.type,lastModified:f.lastModified});
+  let meta=await inspectFile(fileObj),parsed=null,usedAI=false,ruleError=null;
+  if(meta.type!=='Не определён автоматически'){
+    try{parsed=await parseMarketplaceFile(fileObj,buf,meta)}catch(err){ruleError=err}
+  }
+  if(meta.type==='Не определён автоматически'||ruleError){
+    const aiResult=await parseWithAI(fileObj,buf);meta=aiResult.meta;parsed=aiResult.parsed;usedAI=true;
+  }
   const old=await sbRequest('uploads?select=id,file_name&file_hash=eq.'+encodeURIComponent(hash)+'&limit=1');
-  if(old&&old.length){const parsedRows=await insertParsedRows(old[0].id,parsed,false);return {duplicate:true,meta,parsedRows,period:parsed.period}}
-  const row={file_name:f.name,file_hash:hash,marketplace:marketFromType(meta.type),report_type:meta.type,period_from:parsed.period.from,period_to:parsed.period.to,status:meta.type==='Не определён автоматически'?'needs_recognition':'recognized',recognition_method:meta.type==='Не определён автоматически'?'pending_ai':'rules',recognition_confidence:meta.type==='Не определён автоматически'?null:0.95};
+  if(old&&old.length){const parsedRows=await insertParsedRows(old[0].id,parsed,false);return {duplicate:true,meta,parsedRows,period:parsed.period,usedAI}}
+  const isOwnExpense=meta.type==='Банк / расходы';
+  const row={file_name:f.name,file_hash:hash,marketplace:marketFromType(meta.type),report_type:meta.type,period_from:parsed.period.from,period_to:parsed.period.to,status:isOwnExpense?'recognized_needs_expense_import':'recognized',recognition_method:usedAI?'ai':'rules',recognition_confidence:usedAI?Number(meta.ai?.confidence||0):0.95};
   const data=await sbRequest('uploads',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)}),saved=Array.isArray(data)?data[0]:data;
-  const parsedRows=await insertParsedRows(saved.id,parsed);await putLocal({id:hash,name:f.name,type:meta.type,rows:meta.rows,headers:meta.headers,size:buf.byteLength,addedAt:new Date().toISOString(),uploadId:saved?.id});return {duplicate:false,meta,data:saved,parsedRows,period:parsed.period}
+  const parsedRows=isOwnExpense?0:await insertParsedRows(saved.id,parsed);await putLocal({id:hash,name:f.name,type:meta.type,rows:meta.rows,headers:meta.headers,size:buf.byteLength,addedAt:new Date().toISOString(),uploadId:saved?.id});return {duplicate:false,meta,data:saved,parsedRows,period:parsed.period,usedAI,isOwnExpense}
 }
 function describeUploadError(err){
   if(!err)return 'Неизвестная ошибка';
@@ -365,11 +420,11 @@ const xs=document.getElementById('xlsxStatus');if(xs){xs.innerHTML=(typeof XLSX!
 const fu=document.getElementById('fileUpload');if(fu)fu.addEventListener('change',async e=>{
   const files=[...e.target.files],st=document.getElementById('uploadStatus');
   st.innerHTML='Распознаю и сохраняю '+files.length+' файл(а/ов)…';
-  let added=0,dups=0,unknown=0,parsedRows=0;const errors=[];
+  let added=0,dups=0,unknown=0,aiUsed=0,ownExpenses=0,parsedRows=0;const errors=[];
   for(const f of files){
     try{
       const x=await saveIncomingFile(f);
-      if(x.duplicate)dups++;else{added++;if(x.meta.type==='Не определён автоматически')unknown++} parsedRows+=x.parsedRows||0
+      if(x.duplicate)dups++;else{added++;if(x.meta.type==='Не определён автоматически')unknown++;if(x.usedAI)aiUsed++;if(x.isOwnExpense)ownExpenses++} parsedRows+=x.parsedRows||0
     }catch(err){
       console.error('Ошибка загрузки '+f.name,err);
       errors.push({name:f.name,message:describeUploadError(err)});
@@ -377,7 +432,7 @@ const fu=document.getElementById('fileUpload');if(fu)fu.addEventListener('change
   }
   await refreshArchive();
   await loadSupabaseIntoDashboard().catch(err=>console.warn('Dashboard reload after upload',err));
-  let html=`<b>Готово:</b> файлов добавлено ${added}, дублей ${dups}, строк данных записано <b>${parsedRows}</b>${unknown?', требуют ИИ-распознавания '+unknown:''}${errors.length?', ошибок '+errors.length:''}.`;
+  let html=`<b>Готово:</b> файлов добавлено ${added}, дублей ${dups}, строк данных записано <b>${parsedRows}</b>${aiUsed?', ИИ распознал '+aiUsed:''}${ownExpenses?', бухгалтерских/банковских отчётов '+ownExpenses+' (распознаны, импорт расходов подключим отдельно)':''}${unknown?', не распознано '+unknown:''}${errors.length?', ошибок '+errors.length:''}.`;
   if(errors.length){
     html+=`<div style="margin-top:10px;padding:10px;border:1px solid #7f1d1d;background:#2b1116;border-radius:9px;color:#fecaca"><b>Почему не загрузилось:</b>`+errors.map(x=>`<div style="margin-top:7px"><b>${esc(x.name)}</b><br><span style="user-select:text">${esc(x.message)}</span></div>`).join('')+`</div>`;
   }
