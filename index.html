@@ -33,7 +33,7 @@
 <section id="current"><h2>Текущий период — Ozon + Яндекс</h2><div class="note">Оперативный срез текущего незакрытого периода. Ozon и Яндекс показываются рядом; закрытые финансовые отчёты не подменяются оперативными заказами.</div><div id="currentKpi" class="grid"></div><div class="scroll"><table id="currentTable"></table></div></section><section id="stocks"><h2>Остатки и прогноз поставок</h2><div class="note">Прогноз Ozon считается по фактическим заказам за последние 28 дней в соответствующем кластере. Целевой запас можно менять. Для Яндекс прогноз появится после загрузки отчёта остатков.</div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0"><button class="stock-filter active" data-stock-platform="all">Все площадки</button><button class="stock-filter" data-stock-platform="ozon">Ozon</button><button class="stock-filter" data-stock-platform="yandex">Яндекс</button><label style="margin-left:auto">Целевой запас, дней <input id="targetDays" type="number" min="7" max="120" value="28" style="width:76px;margin-left:8px"></label></div><div id="supplyKpi" class="grid"></div><h3>Что нужно поставить</h3><div class="scroll"><table id="supplyTable"></table></div><h3 style="margin-top:22px">Все остатки</h3><div class="scroll"><table id="stockTable"></table></div><div id="yandexStockEmpty" class="note" style="margin-top:14px"><b>Яндекс Маркет:</b> отчёт остатков пока не загружен. Добавьте его во вкладке «Загрузка данных» — после этого Яндекс включится в общий прогноз поставок.</div></section>
 <section id="funnel"><h2>Яндекс — воронка продаж</h2><div class="scroll"><table id="funnelTable"></table></div><h2>Business Boost</h2><div class="scroll"><table id="boostTable"></table></div></section>
 <section id="bank"><h2>Все банковские операции III квартала</h2><div class="grid"><div class="card"><div class="k">Поступило</div><div class="v">454,823 ₽</div></div><div class="card"><div class="k">Списано</div><div class="v">503,598 ₽</div></div></div><h2>Операции и твоя расшифровка</h2><div class="scroll"><table id="bankTable"></table></div></section>
-<section id="upload"><h2>Загрузка данных</h2>
+<section id="upload"><h2>Загрузка данных</h2><div class="card" style="margin-bottom:16px"><h3 style="margin-top:0">Что загружать каждый месяц</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 22px;line-height:1.55"><div><b>Ozon</b><br>□ Реализация<br>□ Начисления<br>□ Логистика<br>□ Заказы<br>□ Остатки<br>□ Продвижение / реклама — если используется</div><div><b>Яндекс Маркет</b><br>□ Заказы / статистика<br>□ Отчёт о платежах<br>□ Услуги маркетплейса<br>□ Business Boost: сводный + файлы заказов<br>□ Остатки</div><div><b>Бухгалтерия / банк</b><br>□ «Деньги за период» — один раз за закрываемый месяц</div></div><div class="note" style="margin-top:12px"><b>Себестоимость не загружаем ежемесячно.</b> Она хранится в справочнике и обновляется только при изменении закупочной цены, появлении нового SKU или исправлении данных.</div></div>
 <div class="note">Добавляй новые отчёты Ozon и Яндекс Маркета, себестоимость и банковские/операционные расходы. Можно выбрать сразу несколько CSV, XLS или XLSX. Известные форматы обрабатываются в браузере; неизвестные автоматически распознаются ИИ через защищённую Edge Function. API-ключ в сайт не передаётся.</div>
 <div class="row2">
   <div class="card"><div class="k">Новые отчёты</div><div class="small" style="margin:8px 0 14px">Ozon: заказы, финансовые отчёты, остатки. Яндекс: заказы/статистика, услуги, Business Boost. Также — себестоимость и банковские расходы.</div>
@@ -408,11 +408,22 @@ async function saveIncomingFile(f){
   if(meta.type!=='Не определён автоматически'){
     try{parsed=await parseMarketplaceFile(fileObj,buf,meta)}catch(err){ruleError=err}
   }
-  if(meta.type==='Не определён автоматически'||ruleError){
+  // Если старый парсер формально узнал тип, но не извлёк ни одной строки,
+  // это тоже считается нераспознанным форматом и отправляется в ИИ.
+  if(meta.type==='Не определён автоматически'||ruleError||!parsed||!parsed.rows||parsed.rows.length===0){
     const aiResult=await parseWithAI(fileObj,buf);meta=aiResult.meta;parsed=aiResult.parsed;usedAI=true;
   }
   const old=await sbRequest('uploads?select=id,file_name&file_hash=eq.'+encodeURIComponent(hash)+'&limit=1');
-  if(old&&old.length){const parsedRows=await insertParsedRows(old[0].id,parsed,false);if(parsedRows>0){await sbRequest('uploads?id=eq.'+encodeURIComponent(old[0].id),{method:'PATCH',body:JSON.stringify({status:'recognized',recognition_method:usedAI?'ai':'rules',recognition_confidence:usedAI?Number(meta.ai?.confidence||0):0.95})}).catch(()=>{})}return {duplicate:true,meta,parsedRows,period:parsed.period,usedAI}}
+  if(old&&old.length){
+    const existing=await sbRequest('marketplace_data?select=id&upload_id=eq.'+encodeURIComponent(old[0].id)+'&limit=1');
+    if(existing&&existing.length)return {duplicate:true,repaired:false,meta,parsedRows:0,period:parsed.period,usedAI};
+    const parsedRows=await insertParsedRows(old[0].id,parsed,true);
+    if(parsedRows>0){
+      await sbRequest('uploads?id=eq.'+encodeURIComponent(old[0].id),{method:'PATCH',body:JSON.stringify({status:'recognized',recognition_method:usedAI?'ai':'rules',recognition_confidence:usedAI?Number(meta.ai?.confidence||0):0.95})}).catch(()=>{});
+      return {duplicate:false,repaired:true,meta,parsedRows,period:parsed.period,usedAI};
+    }
+    throw new Error('Отчёт распознан, но из него не удалось извлечь строки данных');
+  }
   const isOwnExpense=meta.type==='Банк / расходы';
   const row={file_name:f.name,file_hash:hash,marketplace:marketFromType(meta.type),report_type:meta.type,period_from:parsed.period.from,period_to:parsed.period.to,status:isOwnExpense?'recognized_needs_expense_import':'recognized',recognition_method:usedAI?'ai':'rules',recognition_confidence:usedAI?Number(meta.ai?.confidence||0):0.95};
   const data=await sbRequest('uploads',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)}),saved=Array.isArray(data)?data[0]:data;
@@ -431,11 +442,11 @@ const xs=document.getElementById('xlsxStatus');if(xs){xs.innerHTML=(typeof XLSX!
 const fu=document.getElementById('fileUpload');if(fu)fu.addEventListener('change',async e=>{
   const files=[...e.target.files],st=document.getElementById('uploadStatus');
   st.innerHTML='Распознаю и сохраняю '+files.length+' файл(а/ов)…';
-  let added=0,dups=0,unknown=0,aiUsed=0,ownExpenses=0,parsedRows=0;const errors=[];
+  let added=0,dups=0,repaired=0,unknown=0,aiUsed=0,ownExpenses=0,parsedRows=0;const errors=[];
   for(const f of files){
     try{
       const x=await saveIncomingFile(f);
-      if(x.duplicate)dups++;else{added++;if(x.meta.type==='Не определён автоматически')unknown++;if(x.usedAI)aiUsed++;if(x.isOwnExpense)ownExpenses++} parsedRows+=x.parsedRows||0
+      if(x.duplicate)dups++;else{added++;if(x.repaired)repaired++;if(x.meta.type==='Не определён автоматически')unknown++;if(x.usedAI)aiUsed++;if(x.isOwnExpense)ownExpenses++} parsedRows+=x.parsedRows||0
     }catch(err){
       console.error('Ошибка загрузки '+f.name,err);
       errors.push({name:f.name,message:describeUploadError(err)});
@@ -443,7 +454,7 @@ const fu=document.getElementById('fileUpload');if(fu)fu.addEventListener('change
   }
   await refreshArchive();
   await loadSupabaseIntoDashboard().catch(err=>console.warn('Dashboard reload after upload',err));
-  let html=`<b>Готово:</b> файлов добавлено ${added}, дублей ${dups}, строк данных записано <b>${parsedRows}</b>${aiUsed?', ИИ распознал '+aiUsed:''}${ownExpenses?', бухгалтерских/банковских отчётов '+ownExpenses+' (распознаны, импорт расходов подключим отдельно)':''}${unknown?', не распознано '+unknown:''}${errors.length?', ошибок '+errors.length:''}.`;
+  let html=`<b>Готово:</b> файлов добавлено ${added}, дублей ${dups}${repaired?', восстановлено ранее пустых отчётов '+repaired:''}, строк данных записано <b>${parsedRows}</b>${aiUsed?', ИИ распознал '+aiUsed:''}${ownExpenses?', бухгалтерских/банковских отчётов '+ownExpenses+' (распознаны, импорт расходов подключим отдельно)':''}${unknown?', не распознано '+unknown:''}${errors.length?', ошибок '+errors.length:''}.`;
   if(errors.length){
     html+=`<div style="margin-top:10px;padding:10px;border:1px solid #7f1d1d;background:#2b1116;border-radius:9px;color:#fecaca"><b>Почему не загрузилось:</b>`+errors.map(x=>`<div style="margin-top:7px"><b>${esc(x.name)}</b><br><span style="user-select:text">${esc(x.message)}</span></div>`).join('')+`</div>`;
   }
