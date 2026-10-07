@@ -415,8 +415,8 @@ async function saveIncomingFile(f){
   }
   const old=await sbRequest('uploads?select=id,file_name&file_hash=eq.'+encodeURIComponent(hash)+'&limit=1');
   if(old&&old.length){
-    const existing=await sbRequest('marketplace_data?select=id&upload_id=eq.'+encodeURIComponent(old[0].id)+'&limit=1');
-    if(existing&&existing.length)return {duplicate:true,repaired:false,meta,parsedRows:0,period:parsed.period,usedAI};
+    const existing=await sbRequest('marketplace_data?select=id&upload_id=eq.'+encodeURIComponent(old[0].id));
+    if(existing&&existing.length)return {duplicate:true,repaired:false,meta,parsedRows:0,existingRows:existing.length,period:parsed.period,usedAI};
     const parsedRows=await insertParsedRows(old[0].id,parsed,true);
     if(parsedRows>0){
       await sbRequest('uploads?id=eq.'+encodeURIComponent(old[0].id),{method:'PATCH',body:JSON.stringify({status:'recognized',recognition_method:usedAI?'ai':'rules',recognition_confidence:usedAI?Number(meta.ai?.confidence||0):0.95})}).catch(()=>{});
@@ -442,11 +442,11 @@ const xs=document.getElementById('xlsxStatus');if(xs){xs.innerHTML=(typeof XLSX!
 const fu=document.getElementById('fileUpload');if(fu)fu.addEventListener('change',async e=>{
   const files=[...e.target.files],st=document.getElementById('uploadStatus');
   st.innerHTML='Распознаю и сохраняю '+files.length+' файл(а/ов)…';
-  let added=0,dups=0,repaired=0,unknown=0,aiUsed=0,ownExpenses=0,parsedRows=0;const errors=[];
+  let added=0,dups=0,repaired=0,unknown=0,aiUsed=0,ownExpenses=0,parsedRows=0,alreadyRows=0;const errors=[];
   for(const f of files){
     try{
       const x=await saveIncomingFile(f);
-      if(x.duplicate)dups++;else{added++;if(x.repaired)repaired++;if(x.meta.type==='Не определён автоматически')unknown++;if(x.usedAI)aiUsed++;if(x.isOwnExpense)ownExpenses++} parsedRows+=x.parsedRows||0
+      if(x.duplicate){dups++;alreadyRows+=Number(x.existingRows)||0;}else{added++;if(x.repaired)repaired++;if(x.meta.type==='Не определён автоматически')unknown++;if(x.usedAI)aiUsed++;if(x.isOwnExpense)ownExpenses++} parsedRows+=x.parsedRows||0
     }catch(err){
       console.error('Ошибка загрузки '+f.name,err);
       errors.push({name:f.name,message:describeUploadError(err)});
@@ -454,7 +454,7 @@ const fu=document.getElementById('fileUpload');if(fu)fu.addEventListener('change
   }
   await refreshArchive();
   await loadSupabaseIntoDashboard().catch(err=>console.warn('Dashboard reload after upload',err));
-  let html=`<b>Готово:</b> файлов добавлено ${added}, дублей ${dups}${repaired?', восстановлено ранее пустых отчётов '+repaired:''}, строк данных записано <b>${parsedRows}</b>${aiUsed?', ИИ распознал '+aiUsed:''}${ownExpenses?', бухгалтерских/банковских отчётов '+ownExpenses+' (распознаны, импорт расходов подключим отдельно)':''}${unknown?', не распознано '+unknown:''}${errors.length?', ошибок '+errors.length:''}.`;
+  let html=`<b>Готово:</b> новых файлов ${added}, уже были в базе ${dups}${alreadyRows?' (в них уже сохранено строк: '+alreadyRows+')':''}${repaired?', восстановлено ранее пустых отчётов '+repaired:''}, новых строк записано <b>${parsedRows}</b>${aiUsed?', ИИ распознал '+aiUsed:''}${ownExpenses?', бухгалтерских/банковских отчётов '+ownExpenses+' (распознаны, импорт расходов подключим отдельно)':''}${unknown?', не распознано '+unknown:''}${errors.length?', ошибок '+errors.length:''}.`;
   if(errors.length){
     html+=`<div style="margin-top:10px;padding:10px;border:1px solid #7f1d1d;background:#2b1116;border-radius:9px;color:#fecaca"><b>Почему не загрузилось:</b>`+errors.map(x=>`<div style="margin-top:7px"><b>${esc(x.name)}</b><br><span style="user-select:text">${esc(x.message)}</span></div>`).join('')+`</div>`;
   }
