@@ -202,7 +202,12 @@ function aiCacheKey(fileName,sheetName,rows){
 async function callAIReportParser(fileName,sheetName,rows){
   const key=aiCacheKey(fileName,sheetName,rows);
   try{const cached=localStorage.getItem(key);if(cached)return {...JSON.parse(cached),_cached:true}}catch{}
-  const r=await fetch(AI_PARSER_URL,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({file_name:fileName,sheet_name:sheetName,rows:(rows||[]).slice(0,40)})});
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),30000);
+  let r;
+  try{r=await fetch(AI_PARSER_URL,{method:'POST',signal:controller.signal,headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({file_name:fileName,sheet_name:sheetName,rows:(rows||[]).slice(0,40)})})}
+  catch(e){if(e?.name==='AbortError')throw new Error('ИИ не ответил за 30 секунд');throw e}
+  finally{clearTimeout(timer)}
   const body=await r.json().catch(()=>null);
   if(!r.ok||!body?.ok)throw new Error(body?.error||('ИИ-распознавание: HTTP '+r.status));
   const result=body.result||{};
@@ -245,10 +250,12 @@ async function parseWithAI(f,buf){
   return {meta:{name:f.name,type:aiTypeLabel(best.ai.marketplace,best.ai.report_type),sheet:best.sn,headerRow:best.ai.header_row,headers:best.rows[best.ai.header_row]||[],ai:best.ai},parsed:parseAIWorkbookRows(f.name,best.sn,best.rows,best.ai)};
 }
 async function sbRequest(path,options={}){
-  const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
-    ...options,
-    headers:{...SB_HEADERS,...(options.headers||{})}
-  });
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),20000);
+  let r;
+  try{r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{...options,signal:controller.signal,headers:{...SB_HEADERS,...(options.headers||{})}})}
+  catch(e){if(e?.name==='AbortError')throw new Error('Supabase не ответил за 20 секунд');throw e}
+  finally{clearTimeout(timer)}
   const text=await r.text();
   let body=null;
   if(text){try{body=JSON.parse(text)}catch{body=text}}
@@ -402,32 +409,49 @@ async function insertParsedRows(uploadId,parsed,force=false){
   }
   return count;
 }
-async function saveIncomingFile(f){
+async function saveIncomingFile(f,onStage=()=>{}){
+  onStage('Проверяю, не загружен ли файл раньше…');
   const buf=await f.arrayBuffer(),hash=await sha256(buf),fileObj=new File([buf],f.name,{type:f.type,lastModified:f.lastModified});
+
+  // Сначала проверяем хэш. Уже сохранённый файл не отправляем повторно ни в Excel-парсер, ни в ИИ.
+  const old=await sbRequest('uploads?select=id,file_name,report_type,marketplace,period_from,period_to&file_hash=eq.'+encodeURIComponent(hash)+'&limit=1');
+  if(old&&old.length){
+    onStage('Файл уже есть в базе — проверяю сохранённые строки…');
+    const existing=await sbRequest('marketplace_data?select=id&upload_id=eq.'+encodeURIComponent(old[0].id)+'&limit=10000');
+    if(existing&&existing.length){
+      return {duplicate:true,repaired:false,meta:{type:old[0].report_type||'Уже в базе'},parsedRows:0,existingRows:existing.length,period:{from:old[0].period_from||null,to:old[0].period_to||null},usedAI:false};
+    }
+    // Запись uploads есть, но строк данных нет: только тогда реально разбираем файл заново.
+    onStage('В истории файл есть, но данных нет — восстанавливаю…');
+  }else onStage('Новый файл — распознаю структуру…');
+
   let meta=await inspectFile(fileObj),parsed=null,usedAI=false,ruleError=null;
   if(meta.type!=='Не определён автоматически'){
     try{parsed=await parseMarketplaceFile(fileObj,buf,meta)}catch(err){ruleError=err}
   }
-  // Если старый парсер формально узнал тип, но не извлёк ни одной строки,
-  // это тоже считается нераспознанным форматом и отправляется в ИИ.
   if(meta.type==='Не определён автоматически'||ruleError||!parsed||!parsed.rows||parsed.rows.length===0){
+    onStage('Формат требует ИИ — распознаю…');
     const aiResult=await parseWithAI(fileObj,buf);meta=aiResult.meta;parsed=aiResult.parsed;usedAI=true;
   }
-  const old=await sbRequest('uploads?select=id,file_name&file_hash=eq.'+encodeURIComponent(hash)+'&limit=1');
+  if(!parsed?.rows?.length)throw new Error('Отчёт распознан, но строки данных не извлечены');
+
   if(old&&old.length){
-    const existing=await sbRequest('marketplace_data?select=id&upload_id=eq.'+encodeURIComponent(old[0].id));
-    if(existing&&existing.length)return {duplicate:true,repaired:false,meta,parsedRows:0,existingRows:existing.length,period:parsed.period,usedAI};
+    onStage('Записываю восстановленные строки…');
     const parsedRows=await insertParsedRows(old[0].id,parsed,true);
     if(parsedRows>0){
       await sbRequest('uploads?id=eq.'+encodeURIComponent(old[0].id),{method:'PATCH',body:JSON.stringify({status:'recognized',recognition_method:usedAI?'ai':'rules',recognition_confidence:usedAI?Number(meta.ai?.confidence||0):0.95})}).catch(()=>{});
       return {duplicate:false,repaired:true,meta,parsedRows,period:parsed.period,usedAI};
     }
-    throw new Error('Отчёт распознан, но из него не удалось извлечь строки данных');
+    throw new Error('Отчёт распознан, но из него не удалось записать строки данных');
   }
+
   const isOwnExpense=meta.type==='Банк / расходы';
   const row={file_name:f.name,file_hash:hash,marketplace:marketFromType(meta.type),report_type:meta.type,period_from:parsed.period.from,period_to:parsed.period.to,status:isOwnExpense?'recognized_needs_expense_import':'recognized',recognition_method:usedAI?'ai':'rules',recognition_confidence:usedAI?Number(meta.ai?.confidence||0):0.95};
+  onStage('Сохраняю в базу…');
   const data=await sbRequest('uploads',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)}),saved=Array.isArray(data)?data[0]:data;
-  const parsedRows=isOwnExpense?0:await insertParsedRows(saved.id,parsed);await putLocal({id:hash,name:f.name,type:meta.type,rows:meta.rows,headers:meta.headers,size:buf.byteLength,addedAt:new Date().toISOString(),uploadId:saved?.id});return {duplicate:false,meta,data:saved,parsedRows,period:parsed.period,usedAI,isOwnExpense}
+  const parsedRows=isOwnExpense?0:await insertParsedRows(saved.id,parsed);
+  await putLocal({id:hash,name:f.name,type:meta.type,rows:meta.rows,headers:meta.headers,size:buf.byteLength,addedAt:new Date().toISOString(),uploadId:saved?.id});
+  return {duplicate:false,meta,data:saved,parsedRows,period:parsed.period,usedAI,isOwnExpense};
 }
 function describeUploadError(err){
   if(!err)return 'Неизвестная ошибка';
@@ -441,11 +465,11 @@ function describeUploadError(err){
 const xs=document.getElementById('xlsxStatus');if(xs){xs.innerHTML=(typeof XLSX!=='undefined')?'<span style="color:#15803d">Excel-модуль готов</span>':'<span style="color:#b91c1c">Excel-модуль не загрузился — обнови страницу при включённом интернете</span>';}
 const fu=document.getElementById('fileUpload');if(fu)fu.addEventListener('change',async e=>{
   const files=[...e.target.files],st=document.getElementById('uploadStatus');
-  st.innerHTML='Распознаю и сохраняю '+files.length+' файл(а/ов)…';
+  st.innerHTML='Начинаю обработку '+files.length+' файл(а/ов)…';
   let added=0,dups=0,repaired=0,unknown=0,aiUsed=0,ownExpenses=0,parsedRows=0,alreadyRows=0;const errors=[];
   for(const f of files){
     try{
-      const x=await saveIncomingFile(f);
+      const x=await saveIncomingFile(f,msg=>{st.innerHTML='<b>'+esc(f.name)+'</b><br>'+esc(msg)});
       if(x.duplicate){dups++;alreadyRows+=Number(x.existingRows)||0;}else{added++;if(x.repaired)repaired++;if(x.meta.type==='Не определён автоматически')unknown++;if(x.usedAI)aiUsed++;if(x.isOwnExpense)ownExpenses++} parsedRows+=x.parsedRows||0
     }catch(err){
       console.error('Ошибка загрузки '+f.name,err);
