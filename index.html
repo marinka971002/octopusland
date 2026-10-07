@@ -10,7 +10,7 @@
 @media(max-width:1100px){body{padding-left:0}.tabs{position:static;width:auto;padding:10px 16px;flex-direction:row;overflow:auto;border-right:0;border-bottom:1px solid var(--line)}.tabs:before{display:none}header{position:static}.filterbar{top:0}.grid{grid-template-columns:repeat(2,1fr)}.visual-grid,.row2{grid-template-columns:1fr}.wrap{padding:16px}.product-row{grid-template-columns:120px 1fr 75px}}
 @media(max-width:600px){.grid{grid-template-columns:1fr 1fr}.v{font-size:18px}.chart-card{padding:14px}.filterbar .status{min-width:100%;margin-left:0}}
 </style></head>
-<body><header><h1>Octopusland — аналитика маркетплейсов</h1><div class="sub">Ozon + Яндекс Маркет · УСН 6% · данные встроены в файл · сентябрь частичный</div></header>
+<body><header><h1>Octopusland — аналитика маркетплейсов</h1><div class="sub">Ozon + Яндекс Маркет · УСН 6% + доп. 1% свыше 300 000 ₽/год · сентябрь частичный</div></header>
 <div class="wrap">
 <div class="filterbar" id="globalFilters">
 <label>Период<select id="periodFilter"><option value="all">Весь период</option><option value="2026-07">Июль 2026</option><option value="2026-08">Август 2026</option><option value="2026-09">Сентябрь 2026</option><option value="current">Текущий месяц</option><option value="custom">Свой период</option></select></label>
@@ -26,7 +26,7 @@
 <div class="visual-grid"><div class="chart-card"><div class="chart-title">Динамика выручки</div><div class="chart-sub">По месяцам и площадкам</div><div id="revenueChart"></div></div><div class="chart-card"><div class="chart-title">Выручка по площадкам</div><div class="chart-sub">Доля в выбранном периоде</div><div id="platformChart"></div></div></div>
 <div class="chart-card products-card"><div class="chart-title">Выручка по товарам</div><div class="chart-sub">Топ SKU в выбранном периоде</div><div id="productChart"></div></div>
 <h2>Финансы по площадкам и месяцам</h2><div class="scroll"><table id="summary"></table></div>
-<h2>Что важно</h2><div class="row2"><div class="card" id="insights"></div><div class="card"><div class="k">УСН</div><div class="v">6%</div><div class="small">считается от выручки в расчётной модели, отдельно от комиссий и логистики</div><br><div class="k">Банк, III квартал</div><div class="v" id="bankKpi"></div></div></div></section>
+<h2>Что важно</h2><div class="row2"><div class="card" id="insights"></div><div class="card"><div class="k">Налоги</div><div class="v">УСН 6% + 1%</div><div class="small">УСН 6% от дохода; дополнительный 1% — с годового дохода свыше 300 000 ₽. Для точного 1% нужен полный доход с начала года.</div><br><div class="k">Банк, III квартал</div><div class="v" id="bankKpi"></div></div></div></section>
 <section id="unit"><h2>Юнит-экономика по SKU</h2><div class="note">Прибыль/маржа/ROI показываются только для SKU, где в твоей таблице есть себестоимость. Для остальных выручка и фактические услуги площадки показаны, но прибыль не выдумывается.</div><div class="scroll"><table id="unitTable"></table></div></section>
 <section id="yandex"><h2>Яндекс Маркет — фактические услуги по SKU</h2><div class="scroll"><table id="yTable"></table></div></section>
 <section id="ozon"><h2>Ozon — реализация, комиссия, доставка и возвраты</h2><div class="note">Здесь используются строки отчёта «Суммы услуг и расходы на реализацию»: артикул, реализовано, вознаграждение Ozon, обработка/доставка и расходы возвратов. Это не цена из orders.csv.</div><div class="scroll"><table id="oTable"></table></div></section>
@@ -211,8 +211,19 @@ async function callAIReportParser(fileName,sheetName,rows){
   return result;
 }
 function mappedValue(obj,mapping,key){const h=mapping?.[key];return h!=null&&h!==''?obj[h]:null}
+function resolveAIHeaderRow(rows,ai){
+  const mapping=ai?.mapping||{};
+  const wanted=Object.values(mapping).filter(v=>v!=null&&v!=='').map(v=>String(v).trim().toLowerCase());
+  let best=Math.max(0,Number(ai?.header_row)||0),bestScore=-1;
+  for(let i=0;i<Math.min(rows.length,60);i++){
+    const cells=(rows[i]||[]).map(v=>String(v??'').trim().toLowerCase());
+    const score=wanted.reduce((n,h)=>n+(cells.includes(h)?1:0),0);
+    if(score>bestScore){bestScore=score;best=i}
+  }
+  return bestScore>0?best:Math.max(0,Number(ai?.header_row)||0);
+}
 function parseAIWorkbookRows(fileName,sheetName,rows,ai){
-  const hi=Math.max(0,Number(ai.header_row)||0),objs=rowsToObjects(rows,hi),mp=String(ai.marketplace||'').toLowerCase(),rt=String(ai.report_type||'').toLowerCase(),mapping=ai.mapping||{},out=[];
+  const hi=resolveAIHeaderRow(rows,ai),objs=rowsToObjects(rows,hi),mp=String(ai.marketplace||'').toLowerCase(),rt=String(ai.report_type||'').toLowerCase(),mapping=ai.mapping||{},out=[];
   const textPeriod=extractPeriod((rows||[]).slice(0,12).flat().join(' '));
   for(const r of objs){
     const d=anyDate(mappedValue(r,mapping,'operation_date'))||anyDate(mappedValue(r,mapping,'expense_date'))||textPeriod.to;
@@ -401,7 +412,7 @@ async function saveIncomingFile(f){
     const aiResult=await parseWithAI(fileObj,buf);meta=aiResult.meta;parsed=aiResult.parsed;usedAI=true;
   }
   const old=await sbRequest('uploads?select=id,file_name&file_hash=eq.'+encodeURIComponent(hash)+'&limit=1');
-  if(old&&old.length){const parsedRows=await insertParsedRows(old[0].id,parsed,false);return {duplicate:true,meta,parsedRows,period:parsed.period,usedAI}}
+  if(old&&old.length){const parsedRows=await insertParsedRows(old[0].id,parsed,false);if(parsedRows>0){await sbRequest('uploads?id=eq.'+encodeURIComponent(old[0].id),{method:'PATCH',body:JSON.stringify({status:'recognized',recognition_method:usedAI?'ai':'rules',recognition_confidence:usedAI?Number(meta.ai?.confidence||0):0.95})}).catch(()=>{})}return {duplicate:true,meta,parsedRows,period:parsed.period,usedAI}}
   const isOwnExpense=meta.type==='Банк / расходы';
   const row={file_name:f.name,file_hash:hash,marketplace:marketFromType(meta.type),report_type:meta.type,period_from:parsed.period.from,period_to:parsed.period.to,status:isOwnExpense?'recognized_needs_expense_import':'recognized',recognition_method:usedAI?'ai':'rules',recognition_confidence:usedAI?Number(meta.ai?.confidence||0):0.95};
   const data=await sbRequest('uploads',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(row)}),saved=Array.isArray(data)?data[0]:data;
