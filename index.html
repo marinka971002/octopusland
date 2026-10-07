@@ -121,11 +121,20 @@ function renderFinance(){
  renderCurrent();renderBank();
 }
 function renderCurrent(){const showSep=activePeriod==='all'||activePeriod==='current'||activePeriod==='2026-09'||(activePeriod==='custom'&&periodMatchMonth('2026-09'));const ozCur=showSep&&platformMatch('Ozon')?D.ozon_orders.filter(r=>String(r['Принят в обработку']||'').startsWith('2026-09')):[];const yaCur=showSep&&platformMatch('Яндекс')?D.unit.filter(r=>r.platform==='Яндекс'&&r.month==='2026-09*'):[];const ozQty=ozCur.reduce((a,r)=>a+(+r['Количество']||0),0),ozAmt=ozCur.reduce((a,r)=>a+(+r['Сумма отправления']||0),0),yaQty=total(yaCur,'qty'),yaAmt=total(yaCur,'revenue'),yaFees=total(yaCur,'fees');document.getElementById('currentKpi').innerHTML=`<div class="card"><div class="k">Ozon · заказы</div><div class="v">${num(ozCur.length)}</div><div class="small">${num(ozQty)} шт. · ${rub(ozAmt)}</div></div><div class="card"><div class="k">Яндекс · текущий период</div><div class="v">${rub(yaAmt)}</div><div class="small">${num(yaQty)} шт. · услуги ${rub(yaFees)}</div></div><div class="card"><div class="k">Итого оперативно</div><div class="v">${rub(ozAmt+yaAmt)}</div></div>`;table('currentTable',['Площадка','Период','Заказы/строки','Продано, шт.','Оперативная сумма','Расходы МП','Комментарий'],[...(platformMatch('Ozon')?[`<tr><td>Ozon</td><td>сентябрь</td><td>${num(ozCur.length)}</td><td>${num(ozQty)}</td><td>${rub(ozAmt)}</td><td>—</td><td>Расходы после закрытия финансового отчёта</td></tr>`]:[]),...(platformMatch('Яндекс')?[`<tr><td>Яндекс</td><td>01–20.09</td><td>${num(yaCur.length)}</td><td>${num(yaQty)}</td><td>${rub(yaAmt)}</td><td>${rub(yaFees)}</td><td>Есть услуги по заказам</td></tr>`]:[])])}
+function classifyOwnBankExpense(r){
+ const text=((r.desc||'')+' '+(r.counterparty||'')+' '+(r.type||'')).toLowerCase().replace(/ё/g,'е');
+ if(!(+r.out||0))return {...r,exclude:true,expenseClass:'Поступление / не расход'};
+ if(/между\s+(своими|собственными)|перевод.*счет|собственн.*средств/.test(text))return {...r,exclude:true,expenseClass:'Перевод между своими счетами'};
+ if(/(^|\s)(ozon|озон|яндекс маркет|yandex market)(\s|$)/.test(text))return {...r,exclude:true,expenseClass:'Расход маркетплейса — уже учтён'};
+ if(/фнс|налог|страхов.*взнос|взнос.*ип|казначейств/.test(text))return {...r,exclude:true,expenseClass:'Налоги / взносы — считаются отдельно'};
+ if(/закуп|партия|товар.*для продаж|оплата поставщик|поставщик.*товар/.test(text))return {...r,exclude:true,expenseClass:'Закупка товара — через себестоимость'};
+ return {...r,exclude:false,expenseClass:'Операционный расход'};
+}
 function renderBank(){
- let rows=(D.bank||[]).slice();
+ let rows=(D.bank||[]).map(classifyOwnBankExpense);
  if(activePeriod!=='all'){rows=rows.filter(r=>{const d=String(r.date||'');if(activePeriod==='custom'){const a=document.getElementById('dateFrom').value,b=document.getElementById('dateTo').value;return (!a||d>=a)&&(!b||d<=b)}const m=activePeriod==='current'?'2026-09':activePeriod;return d.startsWith(m)})}
  const bin=rows.reduce((a,r)=>a+(+r.in||0),0),bout=rows.reduce((a,r)=>a+(+r.out||0),0),own=rows.reduce((a,r)=>a+(r.exclude?0:(+r.out||0)),0);
- table('bankTable',['Дата','Контрагент','Поступило','Списано','Тип','Расшифровка'],rows.map(r=>`<tr><td>${r.date||'—'}</td><td>${esc(r.counterparty||'')}</td><td class="good">${r.in?rub(r.in):''}</td><td class="bad">${r.out?rub(r.out):''}</td><td>${esc(r.exclude?'Не учитываем повторно':(r.type||'Расход'))}</td><td>${esc(r.desc||'')}</td></tr>`));
+ table('bankTable',['Дата','Контрагент','Поступило','Списано','Учитываем в прибыли','Категория','Расшифровка'],rows.map(r=>`<tr><td>${r.date||'—'}</td><td>${esc(r.counterparty||'')}</td><td class="good">${r.in?rub(r.in):''}</td><td class="bad">${r.out?rub(r.out):''}</td><td>${r.out?(r.exclude?'<span class="muted">Нет</span>':'<span class="good">Да</span>'):''}</td><td>${esc(r.expenseClass||r.type||'')}</td><td>${esc(r.desc||'')}</td></tr>`));
  const e1=document.getElementById('bankInTotal'),e2=document.getElementById('bankOutTotal'),e3=document.getElementById('bankOwnExpenseTotal'),e4=document.getElementById('netAfterOwnExpenses');if(e1)e1.textContent=rub(bin);if(e2)e2.textContent=rub(bout);if(e3)e3.textContent=rub(own);
  const known=filterUnits().filter(r=>r.profit!=null),profit=total(known,'profit');if(e4)e4.textContent=rub(profit-own);document.getElementById('bankKpi').textContent=rub(bin)+' / '+rub(bout)
 }
@@ -268,9 +277,12 @@ function parseBankRowsFromGrid(rows,ai){
     const text=(desc+' '+counterparty).toLowerCase().replace(/ё/g,'е');
     const selfTransfer=/между\s+(своими|собственными)|перевод.*счет|собственн.*средств/.test(text);
     const marketplaceDuplicate=/(^|\s)(ozon|озон|яндекс маркет|yandex market)(\s|$)/.test(text);
-    const excluded=selfTransfer||marketplaceDuplicate;
+    const taxPayment=/фнс|налог|страхов.*взнос|взнос.*ип|казначейств/.test(text);
+    const inventoryPurchase=/закуп|партия|товар.*для продаж|оплата поставщик|поставщик.*товар/.test(text);
+    const excluded=selfTransfer||marketplaceDuplicate||taxPayment||inventoryPurchase;
+    const reason=selfTransfer?'Перевод между своими счетами':marketplaceDuplicate?'Расход маркетплейса учитывается по отчёту площадки':taxPayment?'Налоги / взносы считаются отдельно':inventoryPurchase?'Закупка товара учитывается через себестоимость':'';
     if(!d&&!incoming&&!expense&&!desc&&!counterparty)continue;
-    out.push({marketplace:'Банк',report_type:'Банк / расходы',operation_date:d||period.to,month:monthStart(d||period.to),sku:null,offer_id:null,product_name:null,order_id:null,quantity:0,revenue:0,commission:0,logistics:0,storage:0,advertising:0,returns:0,other_expenses:excluded?0:expense,payout:incoming-expense,raw_data:{bank:true,incoming,outgoing:expense,description:desc,counterparty,excluded_from_profit:excluded,exclude_reason:selfTransfer?'Перевод между своими счетами':marketplaceDuplicate?'Расход маркетплейса учитывается по отчёту площадки':'',source_row:r}});
+    out.push({marketplace:'Банк',report_type:'Банк / расходы',operation_date:d||period.to,month:monthStart(d||period.to),sku:null,offer_id:null,product_name:null,order_id:null,quantity:0,revenue:0,commission:0,logistics:0,storage:0,advertising:0,returns:0,other_expenses:excluded?0:expense,payout:incoming-expense,raw_data:{bank:true,incoming,outgoing:expense,description:desc,counterparty,excluded_from_profit:excluded,exclude_reason:reason,source_row:r}});
   }
   return {rows:out,period,ai};
 }
